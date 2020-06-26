@@ -1,0 +1,122 @@
+* Is A?
+  #+begin_src emacs-lisp
+    (defconst *is-a-mac* (eq system-type 'darwin))
+    (defconst *is-a-linux* (eq system-type 'gnu/linux))
+  #+end_src
+* UI
+  #+begin_src emacs-lisp
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (global-linum-mode 1)
+    ;;(setq inhibit-startup-message t)
+    (global-hl-line-mode t)
+    (when *is-a-mac*
+    (set-frame-font "Monaco 14"))
+    (when *is-a-linux*
+      (set-frame-font "Operator Mono 12"))
+    (if (version< "27.0" emacs-version)
+	       (set-fontset-font
+		"fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
+	     (set-fontset-font
+	      t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+  #+end_src
+* Editor
+  #+begin_src emacs-lisp
+    ;; 自动加载外部修改过的文件
+    (global-auto-revert-mode 1)
+    ;; 关闭自己生产的保存文件
+    (setq auto-save-default nil)
+    ;; 关闭自己生产的备份文件
+    (setq make-backup-files nil)
+    ;; 选中某个区域继续编辑可以替换掉该区域
+    (delete-selection-mode 1)
+    ;; 设置h 文件默认为c++文件
+    (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+    ;; orgmode
+    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+  #+end_src
+* Straight.el
+  #+begin_src emacs-lisp
+    (defvar bootstrap-version)
+    (let ((bootstrap-file
+	   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	  (bootstrap-version 5))
+      (unless (file-exists-p bootstrap-file)
+	(with-current-buffer
+	    (url-retrieve-synchronously
+	     "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	     'silent 'inhibit-cookies)
+	  (goto-char (point-max))
+	  (eval-print-last-sexp)))
+      (load bootstrap-file nil 'nomessage))
+  #+end_src
+  #+begin_src emacs-lisp
+    (straight-use-package 'use-package)
+    (straight-use-package 'posframe)
+    (straight-use-package 'vterm)
+    (straight-use-package 'htmlize)
+  #+end_src
+* Packages
+** xah_fly_keys
+   #+BEGIN_SRC emacs-lisp
+     (straight-use-package 'xah-fly-keys)
+     (use-package xah-fly-keys
+       :config
+       (xah-fly-keys-set-layout 'qwerty)
+       (xah-fly-keys 1))
+   #+END_SRC 
+** which_key
+   #+begin_src emacs-lisp
+     (straight-use-package 'which-key)
+     (which-key-mode)
+   #+end_src
+  
+** lsp-mode
+   #+begin_src emacs-lisp
+     (straight-use-package 'lsp-mode)
+     (straight-use-package 'lsp-ui)
+     (straight-use-package 'lsp-treemacs)
+     ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+     (setq lsp-keymap-prefix "s-l")
+     (use-package lsp-mode
+       :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+	      (html-mode . lsp)
+	      (css-mode . lsp)
+	      (js-mode . lsp)
+	      ;; if you want which-key integration
+	      (lsp-mode . lsp-enable-which-key-integration))
+       :commands lsp)
+     (use-package lsp-ui :commands lsp-ui-mode)
+     (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+   #+end_src
+** company
+   #+begin_src emacs-lisp
+     (straight-use-package 'company)
+     (use-package company 
+       :defer 2 
+       :hook (after-init . global-company-mode) 
+       :init (setq company-tooltip-align-annotations t company-idle-delay 0 company-echo-delay 0
+		   company-minimum-prefix-length 1 company-require-match nil company-dabbrev-ignore-case
+		   nil company-dabbrev-downcase nil company-show-numbers t) 
+       :config 
+       :bind (:map company-active-map
+		   ("M-n" . nil) 
+		   ("M-p" . nil) 
+		   ("C-n" . #'company-select-next) 
+		   ("C-p" . #'company-select-previous)))
+   #+end_src
+** magit
+   #+BEGIN_SRC emacs-lisp
+   (straight-use-package 'magit)
+   #+END_SRC
+** yasnippet
+#+begin_src emacs-lisp
+  (straight-use-package 'yasnippet)
+  (straight-use-package 'yasnippet-snippets)
+  (use-package yasnippet
+    :commands
+    (yas-reload-all)
+    :init
+    (add-hook 'prog-mode-hook #'yas-minor-mode))
+#+end_src
