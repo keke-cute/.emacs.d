@@ -65,6 +65,9 @@
        :config
        (xah-fly-keys-set-layout 'qwerty)
        (xah-fly-keys 1))
+     (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+     (define-key xah-fly-w-keymap (kbd "o") 'xah-html-open-in-chrome-browser)
+     (define-key xah-fly-w-keymap (kbd "1") 'delete-other-windows)
    #+END_SRC 
 ** which_key
    #+begin_src emacs-lisp
@@ -120,3 +123,41 @@
     :init
     (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+end_src
+* Func
+** Open in Google Chrome
+   #+begin_src emacs-lisp
+     (defun xah-html-open-in-chrome-browser ()
+       "Open the current file or `dired' marked files in Google Chrome browser.
+     Work in Windows, macOS, linux.
+     URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
+     Version 2019-11-10"
+       (interactive)
+       (let* (
+	      ($file-list
+	       (if (string-equal major-mode "dired-mode")
+		   (dired-get-marked-files)
+		 (list (buffer-file-name))))
+	      ($do-it-p (if (<= (length $file-list) 5)
+			    t
+			  (y-or-n-p "Open more than 5 files? "))))
+	 (when $do-it-p
+	   (cond
+	    ((string-equal system-type "darwin")
+	     (mapc
+	      (lambda ($fpath)
+		(shell-command
+		 (format "open -a /Applications/Google\\ Chrome.app \"%s\"" $fpath)))
+	      $file-list))
+	    ((string-equal system-type "windows-nt")
+	     ;; "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" 2019-11-09
+	     (let ((process-connection-type nil))
+	       (mapc
+		(lambda ($fpath)
+		  (start-process "" nil "powershell" "start-process" "chrome" $fpath ))
+		$file-list)))
+	    ((string-equal system-type "gnu/linux")
+	     (mapc
+	      (lambda ($fpath)
+		(shell-command (format "google-chrome-stable \"%s\"" $fpath)))
+	      $file-list))))))
+   #+end_src
