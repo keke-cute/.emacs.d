@@ -1,41 +1,3 @@
-* Is A?
-  #+begin_src emacs-lisp
-    (defconst *is-a-mac* (eq system-type 'darwin))
-    (defconst *is-a-linux* (eq system-type 'gnu/linux))
-  #+end_src
-* UI
-  #+begin_src emacs-lisp
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (global-linum-mode 1)
-    ;;(setq inhibit-startup-message t)
-    (global-hl-line-mode t)
-    (when *is-a-mac*
-    (set-frame-font "Monaco 14"))
-    (when *is-a-linux*
-      (set-frame-font "Operator Mono 12"))
-    (if (version< "27.0" emacs-version)
-	       (set-fontset-font
-		"fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
-	     (set-fontset-font
-	      t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
-  #+end_src
-* Editor
-  #+begin_src emacs-lisp
-    ;; 自动加载外部修改过的文件
-    (global-auto-revert-mode 1)
-    ;; 关闭自己生产的保存文件
-    (setq auto-save-default nil)
-    ;; 关闭自己生产的备份文件
-    (setq make-backup-files nil)
-    ;; 选中某个区域继续编辑可以替换掉该区域
-    (delete-selection-mode 1)
-    ;; 设置h 文件默认为c++文件
-    (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-    ;; orgmode
-    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
-  #+end_src
 * Straight.el
   #+begin_src emacs-lisp
     (defvar bootstrap-version)
@@ -55,8 +17,81 @@
     (straight-use-package 'use-package)
     (straight-use-package 'posframe)
     (straight-use-package 'vterm)
+    (straight-use-package 'typescript-mode)
     (straight-use-package 'htmlize)
   #+end_src
+* Is A?
+  #+begin_src emacs-lisp
+    (defconst *is-a-mac* (eq system-type 'darwin))
+    (defconst *is-a-linux* (eq system-type 'gnu/linux))
+  #+end_src
+* UI
+  #+begin_src emacs-lisp
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (global-linum-mode 1)
+    ;;(setq inhibit-startup-message t)
+    (global-hl-line-mode t)
+    ;;字体
+    (when *is-a-mac*
+    (set-frame-font "Monaco 14"))
+    (when *is-a-linux*
+      (set-frame-font "Operator Mono 12"))
+    (if (version< "27.0" emacs-version)
+	       (set-fontset-font
+		"fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
+	     (set-fontset-font
+	      t 'symbol (font-spec :family "Noto Color Emoji") nil 'prepend))
+    ;;🌈括号
+    (straight-use-package 'rainbow-delimiters)
+    (use-package rainbow-delimiters
+      :config
+      (set-face-foreground 'rainbow-delimiters-depth-1-face "orange red")
+      (set-face-foreground 'rainbow-delimiters-depth-2-face "gold")
+      (set-face-foreground 'rainbow-delimiters-depth-3-face "yellow")
+      (set-face-foreground 'rainbow-delimiters-depth-4-face "spring green")
+      (set-face-foreground 'rainbow-delimiters-depth-5-face "cyan")
+      (set-face-foreground 'rainbow-delimiters-depth-6-face "magenta")
+      (set-face-foreground 'rainbow-delimiters-depth-7-face "goldenrod")
+      (set-face-foreground 'rainbow-delimiters-depth-8-face "IndianRed1")
+      (set-face-foreground 'rainbow-delimiters-depth-9-face "ivory1")
+
+      (set-face-bold 'rainbow-delimiters-depth-1-face "orange red")
+      (set-face-bold 'rainbow-delimiters-depth-2-face "gold")
+      (set-face-bold 'rainbow-delimiters-depth-3-face "yellow")
+      (set-face-bold 'rainbow-delimiters-depth-4-face "spring green")
+      (set-face-bold 'rainbow-delimiters-depth-5-face "cyan")
+      (set-face-bold 'rainbow-delimiters-depth-6-face "magenta")
+      (set-face-bold 'rainbow-delimiters-depth-7-face "goldenrod")
+      (set-face-bold 'rainbow-delimiters-depth-8-face "IndianRed1")
+      (set-face-bold 'rainbow-delimiters-depth-9-face "ivory1")
+      (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+  #+end_src
+* Editor
+  #+begin_src emacs-lisp
+    ;; 自动加载外部修改过的文件
+    (global-auto-revert-mode 1)
+    ;; 关闭自己生产的保存文件
+    (setq auto-save-default nil)
+    ;; 关闭自己生产的备份文件
+    (setq make-backup-files nil)
+    ;; 选中某个区域继续编辑可以替换掉该区域
+    (delete-selection-mode 1)
+    ;; 设置h 文件默认为c++文件
+    (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+    ;; orgmode
+    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+  #+end_src
+** highlight-indent-guides
+   #+begin_src emacs-lisp
+     (straight-use-package 'highlight-indent-guides)
+     (use-package highlight-indent-guides
+       :hook ((prog-mode web-mode) . highlight-indent-guides-mode)
+       :config
+       (setq highlight-indent-guides-method (if window-system 'character 'nil))
+       (setq highlight-indent-guides-responsive 'stack))
+   #+end_src
 * Packages
 ** xah_fly_keys
    #+BEGIN_SRC emacs-lisp
@@ -87,6 +122,7 @@
 	      (html-mode . lsp)
 	      (css-mode . lsp)
 	      (js-mode . lsp)
+	      (typescript-mode . lsp)
 	      ;; if you want which-key integration
 	      (lsp-mode . lsp-enable-which-key-integration))
        :commands lsp)
