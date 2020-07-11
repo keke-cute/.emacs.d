@@ -186,6 +186,17 @@
     :init
     (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+end_src
+** emacs-rime
+   #+begin_src emacs-lisp
+     (use-package rime
+       :straight (rime :type git
+		       :host github
+		       :repo "DogLooksGood/emacs-rime"
+		       :files ("*.el" "Makefile" "lib.c"))
+       :custom
+       (rime-show-candidate 'posframe)
+       (default-input-method "rime"))
+   #+end_src
 * Func
 ** Open in Google Chrome
    #+begin_src emacs-lisp
