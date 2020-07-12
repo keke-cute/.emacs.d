@@ -108,6 +108,8 @@
     (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
     ;; orgmode
     (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+    ;; without lock files
+    (setq create-lockfiles nil)
   #+end_src
 ** highlight-indent-guides
    #+begin_src emacs-lisp
