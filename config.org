@@ -234,6 +234,6 @@
 	    ((string-equal system-type "gnu/linux")
 	     (mapc
 	      (lambda ($fpath)
-		(shell-command (format "google-chrome-stable \"%s\"" $fpath)))
+		(shell-command (format "chromium \"%s\"" $fpath)))
 	      $file-list))))))
    #+end_src
