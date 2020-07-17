@@ -53,7 +53,7 @@
     (when *is-a-mac*
     (set-frame-font "Monaco 14"))
     (when *is-a-linux*
-      (set-frame-font "Operator Mono 12"))
+      (set-frame-font "Operator Mono Light 12"))
     (if (version< "27.0" emacs-version)
 	       (set-fontset-font
 		"fontset-default" 'unicode "Noto Color Emoji" nil 'prepend)
