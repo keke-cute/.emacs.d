@@ -51,7 +51,7 @@
       ;;(global-hl-line-mode t))
     ;;字体
     (when *is-a-mac*
-    (set-frame-font "Monaco 14"))
+    (set-frame-font "Operator Mono 14"))
     (when *is-a-linux*
       (set-frame-font "Operator Mono Light 12"))
     (if (version< "27.0" emacs-version)
@@ -93,6 +93,15 @@
       (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
       (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
       (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+    (straight-use-package 'doom-modeline)
+    (use-package doom-modeline
+      :init (doom-modeline-mode 1))
+    (straight-use-package 'nyan-mode)
+    (use-package nyan-mode
+      :init (setq nyan-animate-nyancat t
+		       nyan-bar-length 16
+		       nyan-wavy-trail t)
+      :hook ((after-init . nyan-mode)))
   #+end_src
 * Editor
   #+begin_src emacs-lisp
@@ -132,6 +141,7 @@
      (define-key xah-fly-w-keymap (kbd "o") 'xah-html-open-in-chrome-browser)
      (define-key xah-fly-w-keymap (kbd "1") 'delete-other-windows)
      (define-key xah-fly-w-keymap (kbd "t") 'treemacs)
+     (define-key xah-fly-c-keymap (kbd "e") 'counsel-find-file)
    #+END_SRC 
 ** which_key
    #+begin_src emacs-lisp
@@ -139,6 +149,22 @@
      (which-key-mode)
    #+end_src
   
+** IVY
+   #+begin_src emacs-lisp
+     (straight-use-package 'ivy)
+     (straight-use-package 'counsel)
+     (straight-use-package 'swiper)
+     (straight-use-package 'all-the-icons-ivy-rich)
+     (use-package ivy
+       :init
+       (ivy-mode 1)
+       (setq ivy-use-virtual-buffers t)
+       (setq enable-recursive-minibuffers t))
+     (use-package all-the-icons-ivy-rich
+       :init (all-the-icons-ivy-rich-mode 1))
+     (use-package ivy-rich
+       :init (ivy-rich-mode 1))
+   #+end_src
 ** lsp-mode
    #+begin_src emacs-lisp
      (straight-use-package 'lsp-mode)
@@ -236,4 +262,4 @@
 	      (lambda ($fpath)
 		(shell-command (format "chromium \"%s\"" $fpath)))
 	      $file-list))))))
-   #+end_src
+   #+end_
