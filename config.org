@@ -51,6 +51,7 @@
     ;;(global-hl-line-mode t))
     ;;字体
     (when *is-a-mac*
+      (menu-bar-mode 1)
       (set-frame-font "Operator Mono 14"))
     (when *is-a-linux*
       (set-frame-font "Operator Mono 12"))
@@ -147,6 +148,14 @@
        (setq highlight-indent-guides-responsive 'stack))
    #+end_src
 * Packages
+** Tramp
+   #+begin_src emacs-lisp
+     (require 'tramp)
+     (setq tramp-default-method "sshx")
+     (setq tramp-default-user "keke")
+     (setq tramp-default-user "keke"
+	   tramp-default-host "192.168.2.166")
+   #+end_src
 ** xah_fly_keys
    #+BEGIN_SRC emacs-lisp
      (straight-use-package 'xah-fly-keys)
@@ -197,7 +206,12 @@
 	      (typescript-mode . lsp)
 	      ;; if you want which-key integration
 	      (lsp-mode . lsp-enable-which-key-integration))
-       :commands lsp)
+       :commands lsp
+       :config (lsp-register-client
+       (make-lsp-client :new-connection (lsp-tramp-connection "html-languageserver")
+       :major-modes '(html-mode)
+       :remote? t
+       :server-id 'html-remote)))
      (use-package lsp-ui :commands lsp-ui-mode)
      (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
    #+end_src
