@@ -25,10 +25,9 @@
   #+end_src
   #+begin_src emacs-lisp
     (straight-use-package 'use-package)
-    (straight-use-package 'posframe)
-    (straight-use-package 'vterm)
-    (straight-use-package 'typescript-mode)
-    (straight-use-package 'htmlize)
+    (straight-use-package 'org-roam)
+    (straight-use-package 'org-roam-server)
+    (straight-use-package 'which-key)
   #+end_src
 * Is A?
   #+begin_src emacs-lisp
@@ -43,83 +42,8 @@
 * UI
   #+begin_src emacs-lisp
     (when (graphic-p) 
-      (menu-bar-mode -1)
-      (tool-bar-mode -1)
       (scroll-bar-mode -1)
       (global-linum-mode 1))
-    ;;(setq inhibit-startup-message t)
-    ;;(global-hl-line-mode t))
-    ;;字体
-    (when *is-a-mac*
-      (menu-bar-mode 1)
-      (set-frame-font "Operator Mono 14"))
-    (when *is-a-linux*
-      (set-frame-font "Operator Mono 12"))
-    (if (version< "27.0" emacs-version)
-	(set-fontset-font
-	 "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
-      (set-fontset-font
-       t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
-    ;;主题
-    (when (graphic-p)
-      (straight-use-package 'doom-themes)
-      (use-package doom-themes
-	:config
-	;; Global settings (defaults)
-	(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-	      doom-themes-enable-italic t) ; if nil, italics is universally disabled
-	(load-theme 'doom-spacegrey t)
-
-	;; Enable flashing mode-line on errors
-	(doom-themes-visual-bell-config)
-
-	;; Enable custom neotree theme (all-the-icons must be installed!)
-	(doom-themes-neotree-config)
-	;; or for treemacs users
-	(setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-	(doom-themes-treemacs-config)
-
-	;; Corrects (and improves) org-mode's native fontification.
-	(doom-themes-org-config)))
-    ;;透明
-    (when (graphic-p)
-      (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
-      (add-to-list 'default-frame-alist'(ns-appearance . dark))
-      (add-to-list 'default-frame-alist'(alpha . (80 . 75))))
-    ;;🌈括号
-    (straight-use-package 'rainbow-delimiters)
-    (use-package 
-      rainbow-delimiters 
-      :config
-      ;; 设置每一级括号的颜色
-      (set-face-foreground 'rainbow-delimiters-depth-1-face "orange red") 
-      (set-face-foreground 'rainbow-delimiters-depth-2-face "gold") 
-      (set-face-foreground 'rainbow-delimiters-depth-3-face "yellow") 
-      (set-face-foreground 'rainbow-delimiters-depth-4-face "spring green") 
-      (set-face-foreground 'rainbow-delimiters-depth-5-face "cyan") 
-      (set-face-foreground 'rainbow-delimiters-depth-6-face "magenta") 
-      (set-face-foreground 'rainbow-delimiters-depth-7-face "goldenrod") 
-      (set-face-foreground 'rainbow-delimiters-depth-8-face "IndianRed1") 
-      (set-face-foreground 'rainbow-delimiters-depth-9-face "ivory1") 
-      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
-      (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-    (straight-use-package 'doom-modeline)
-    (use-package doom-modeline
-      :init (doom-modeline-mode 1))
-    (straight-use-package 'nyan-mode)
-    (use-package nyan-mode
-      :init (setq nyan-animate-nyancat t
-		  nyan-bar-length 16
-		  nyan-wavy-trail t)
-      :hook ((after-init . nyan-mode)))
   #+end_src
 * Editor
   #+begin_src emacs-lisp
@@ -138,153 +62,42 @@
     ;; without lock files
     (setq create-lockfiles nil)
   #+end_src
-** highlight-indent-guides
+* Package
+** Roam
    #+begin_src emacs-lisp
-     (straight-use-package 'highlight-indent-guides)
-     (use-package highlight-indent-guides
-       :hook ((prog-mode web-mode) . highlight-indent-guides-mode)
-       :config
-       (setq highlight-indent-guides-method (if window-system 'character 'nil))
-       (setq highlight-indent-guides-responsive 'stack))
-   #+end_src
-* Packages
-** Tramp
-   #+begin_src emacs-lisp
-     (require 'tramp)
-     (setq tramp-default-method "sshx")
-     (setq tramp-default-user "keke"
-	   tramp-default-host "192.168.2.166")
-   #+end_src
-** xah_fly_keys
-   #+BEGIN_SRC emacs-lisp
-     (straight-use-package 'xah-fly-keys)
-     (use-package xah-fly-keys
-       :config
-       (xah-fly-keys-set-layout 'qwerty)
-       (xah-fly-keys 1))
-     (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-     (define-key xah-fly-w-keymap (kbd "o") 'xah-html-open-in-chrome-browser)
-     (define-key xah-fly-w-keymap (kbd "1") 'delete-other-windows)
-     (define-key xah-fly-w-keymap (kbd "t") 'treemacs)
-     (define-key xah-fly-c-keymap (kbd "e") 'counsel-find-file)
-   #+END_SRC 
-** which_key
-   #+begin_src emacs-lisp
-     (straight-use-package 'which-key)
-     (which-key-mode)
-   #+end_src
-  
-** IVY
-   #+begin_src emacs-lisp
-     (straight-use-package 'ivy)
-     (straight-use-package 'counsel)
-     (straight-use-package 'swiper)
-     (straight-use-package 'all-the-icons-ivy-rich)
-     (use-package ivy
-       :init
-       (ivy-mode 1)
-       (setq ivy-use-virtual-buffers t)
-       (setq enable-recursive-minibuffers t))
-     (use-package all-the-icons-ivy-rich
-       :init (all-the-icons-ivy-rich-mode 1))
-     (use-package ivy-rich
-       :init (ivy-rich-mode 1))
-   #+end_src
-** lsp-mode
-   #+begin_src emacs-lisp
-     (straight-use-package 'lsp-mode)
-     (straight-use-package 'lsp-ui)
-     (straight-use-package 'lsp-treemacs)
-     ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-     (setq lsp-keymap-prefix "s-l")
-     (use-package lsp-mode
-       :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-	      (html-mode . lsp)
-	      (css-mode . lsp)
-	      (js-mode . lsp)
-	      (typescript-mode . lsp)
-	      ;; if you want which-key integration
-	      (lsp-mode . lsp-enable-which-key-integration))
-       :commands lsp)
-     (use-package lsp-ui :commands lsp-ui-mode)
-     (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-   #+end_src
-** company
-   #+begin_src emacs-lisp
-     (straight-use-package 'company)
-     (use-package company 
-       :defer 2 
-       :hook (after-init . global-company-mode) 
-       :init (setq company-tooltip-align-annotations t company-idle-delay 0 company-echo-delay 0
-		   company-minimum-prefix-length 1 company-require-match nil company-dabbrev-ignore-case
-		   nil company-dabbrev-downcase nil company-show-numbers t) 
-       :config 
-       :bind (:map company-active-map
-		   ("M-n" . nil) 
-		   ("M-p" . nil) 
-		   ("C-n" . #'company-select-next) 
-		   ("C-p" . #'company-select-previous)))
-   #+end_src
-** magit
-   #+BEGIN_SRC emacs-lisp
-   (straight-use-package 'magit)
-   #+END_SRC
-** yasnippet
-#+begin_src emacs-lisp
-  (straight-use-package 'yasnippet)
-  (straight-use-package 'yasnippet-snippets)
-  (use-package yasnippet
-    :commands
-    (yas-reload-all)
-    :init
-    (add-hook 'prog-mode-hook #'yas-minor-mode))
-#+end_src
-** emacs-rime
-   #+begin_src emacs-lisp
-     (use-package rime
-       :straight (rime :type git
-		       :host github
-		       :repo "DogLooksGood/emacs-rime"
-		       :files ("*.el" "Makefile" "lib.c"))
+     (use-package org-roam
+       :hook
+       (after-init . org-roam-mode)
        :custom
-       (rime-show-candidate 'posframe)
-       (default-input-method "rime"))
+       (org-roam-directory "~/src/org/roam")
+       :bind (:map org-roam-mode-map
+		   (("C-c n l" . org-roam)
+		    ("C-c n f" . org-roam-find-file)
+		    ("C-c n g" . org-roam-graph-show))
+		   :map org-mode-map
+		   (("C-c n i" . org-roam-insert))
+		   (("C-c n I" . org-roam-insert-immediate))))
+     (use-package org-roam-server
+       :config
+       (setq org-roam-server-host "127.0.0.1"
+	   org-roam-server-port 9090
+	   org-roam-server-export-inline-images t
+	   org-roam-server-authenticate nil
+	   org-roam-server-label-truncate t
+	   org-roam-server-label-truncate-length 60
+	   org-roam-server-label-wrap-length 20)
+       (org-roam-server-mode)
+       (require 'org-roam-protocol))
    #+end_src
-* Func
-** Open in Google Chrome
+** Which-key
    #+begin_src emacs-lisp
-     (defun xah-html-open-in-chrome-browser ()
-       "Open the current file or `dired' marked files in Google Chrome browser.
-     Work in Windows, macOS, linux.
-     URL `http://ergoemacs.org/emacs/emacs_dired_open_file_in_ext_apps.html'
-     Version 2019-11-10"
-       (interactive)
-       (let* (
-	      ($file-list
-	       (if (string-equal major-mode "dired-mode")
-		   (dired-get-marked-files)
-		 (list (buffer-file-name))))
-	      ($do-it-p (if (<= (length $file-list) 5)
-			    t
-			  (y-or-n-p "Open more than 5 files? "))))
-	 (when $do-it-p
-	   (cond
-	    ((string-equal system-type "darwin")
-	     (mapc
-	      (lambda ($fpath)
-		(shell-command
-		 (format "open -a /Applications/Google\\ Chrome.app \"%s\"" $fpath)))
-	      $file-list))
-	    ((string-equal system-type "windows-nt")
-	     ;; "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" 2019-11-09
-	     (let ((process-connection-type nil))
-	       (mapc
-		(lambda ($fpath)
-		  (start-process "" nil "powershell" "start-process" "chrome" $fpath ))
-		$file-list)))
-	    ((string-equal system-type "gnu/linux")
-	     (mapc
-	      (lambda ($fpath)
-		(shell-command (format "chromium \"%s\"" $fpath)))
-	      $file-list))))))
-   #+end_
+     (use-package which-key
+       :config
+       (which-key-mode))
+   #+end_src
+* Fix
+  #+begin_src emacs-lisp
+    (eval-after-load "org"
+      '(progn
+	 (define-key org-mode-map (kbd "C-<tab>") 'tab-bar-switch-to-next-tab)))
+  #+end_src
