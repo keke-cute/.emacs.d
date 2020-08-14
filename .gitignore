@@ -1,8 +1,11 @@
 straight/
 auto-save-list/
+irony/
+elpa/
+eshell/
+url/
+pyim/
+emojis/
 transient/
-.lsp-session-v1
-config.el
-.cache/
 recentf
-bookmarks
+.lsp-session-v1
