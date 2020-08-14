@@ -95,9 +95,3 @@
        :config
        (which-key-mode))
    #+end_src
-* Fix
-  #+begin_src emacs-lisp
-    (eval-after-load "org"
-      '(progn
-	 (define-key org-mode-map (kbd "C-<tab>") 'tab-bar-switch-to-next-tab)))
-  #+end_src
