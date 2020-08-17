@@ -115,12 +115,15 @@
        :config
        (which-key-mode))
    #+end_src
-** SIS
+** emacs-rime
    #+begin_src emacs-lisp
      (when (graphic-p)
        (when *is-a-linux*
-	 (straight-use-package 'sis)
-	 (use-package sis
-	   :config
-	   (sis-ism-lazyman-config "1" "2" 'fcitx5))))
+	 (use-package rime
+	   :straight (rime :type git
+			   :host github
+			   :repo "DogLooksGood/emacs-rime"
+			   :files ("*.el" "Makefile" "lib.c"))
+	   :custom
+	   (default-input-method "rime"))))
    #+end_src
