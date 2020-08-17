@@ -126,5 +126,5 @@
 			   :files ("*.el" "Makefile" "lib.c"))
 	   :custom
 	   (default-input-method "rime")
-	   (rime-show-candidate "posframe"))))
+	   (rime-show-candidate 'posframe))))
    #+end_src
