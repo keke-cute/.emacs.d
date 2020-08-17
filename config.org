@@ -25,9 +25,7 @@
   #+end_src
   #+begin_src emacs-lisp
     (straight-use-package 'use-package)
-    (straight-use-package 'org-roam)
-    (straight-use-package 'org-roam-server)
-    (straight-use-package 'which-key)
+    (straight-use-package 'magit)
   #+end_src
 * Is A?
   #+begin_src emacs-lisp
@@ -43,7 +41,13 @@
   #+begin_src emacs-lisp
     (when (graphic-p) 
       (scroll-bar-mode -1)
-      (global-linum-mode 1))
+      (global-linum-mode 1)
+      (straight-use-package 'poke-line)
+      (use-package poke-line
+	:config
+	(poke-line-mode 1)
+	(poke-line-set-pokemon "gengar")
+	(setq poke-line-bar-length 10)))
   #+end_src
 * Editor
   #+begin_src emacs-lisp
@@ -78,6 +82,8 @@
    #+end_src
 ** Roam
    #+begin_src emacs-lisp
+     (straight-use-package 'org-roam)
+     (straight-use-package 'org-roam-server)
      (use-package org-roam
        :hook
        (after-init . org-roam-mode)
@@ -104,7 +110,17 @@
    #+end_src
 ** Which-key
    #+begin_src emacs-lisp
+     (straight-use-package 'which-key)
      (use-package which-key
        :config
        (which-key-mode))
+   #+end_src
+** SIS
+   #+begin_src emacs-lisp
+     (when (graphic-p)
+       (when *is-a-linux*
+	 (straight-use-package 'sis)
+	 (use-package sis
+	   :config
+	   (sis-ism-lazyman-config "1" "2" 'fcitx5))))
    #+end_src
