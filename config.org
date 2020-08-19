@@ -26,6 +26,7 @@
   #+begin_src emacs-lisp
     (straight-use-package 'use-package)
     (straight-use-package 'magit)
+    (straight-use-package 'markdown-mode)
   #+end_src
 * Is A?
   #+begin_src emacs-lisp
