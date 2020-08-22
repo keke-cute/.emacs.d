@@ -55,6 +55,7 @@
 	(poke-line-mode 1)
 	(poke-line-set-pokemon "gengar")
 	(setq poke-line-bar-length 10)))
+    (display-time-mode 1)
     ;; 字体设置
     (when (graphic-p)
       (when *is-a-mac*
@@ -89,6 +90,8 @@
     (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
     ;; without lock files
     (setq create-lockfiles nil)
+    ;; y-or-n
+    (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
 * Package
 ** Eaf
