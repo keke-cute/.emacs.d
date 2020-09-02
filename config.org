@@ -49,13 +49,7 @@
 	    '(
 	      (width . 106)
 	      (height . 56)
-	      ))
-      (straight-use-package 'poke-line)
-      (use-package poke-line
-	:config
-	(poke-line-mode 1)
-	(poke-line-set-pokemon "gengar")
-	(setq poke-line-bar-length 10)))
+	      )))
     (display-time-mode 1)
     ;; 字体设置
     (when (graphic-p)
@@ -95,19 +89,6 @@
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
 * Package
-** Eaf
-   #+begin_src emacs-lisp
-     (when (graphic-p)
-       (when *is-a-linux*
-	 (use-package eaf
-	   :load-path "~/src/emacs-application-framework" ; Set to "/usr/share/emacs/site-lisp/eaf" if installed from AUR
-	   :custom
-	   (eaf-find-alternate-file-in-dired t)
-	   :config
-	   (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-	   (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-	   (eaf-bind-key take_photo "p" eaf-camera-keybinding))))
-   #+end_src
 ** Roam
    #+begin_src emacs-lisp
      (straight-use-package 'org-roam)
