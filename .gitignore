@@ -6,3 +6,5 @@ config.el
 .cache/
 recentf
 bookmarks
+eshell/
+tramp

@@ -138,3 +138,7 @@
 	   (default-input-method "rime")
 	   (rime-show-candidate 'posframe))))
    #+end_src
+** vterm
+   #+begin_src emacs-lisp
+     (straight-use-package 'vterm)
+   #+end_src
