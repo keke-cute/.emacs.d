@@ -41,34 +41,38 @@
 * UI
   #+begin_src emacs-lisp
     (when (graphic-p)
+      ;;  (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
+      ;;  (add-to-list 'default-frame-alist'(ns-appearance . dark))
+      ;;  (add-to-list 'default-frame-alist'(alpha . (80 . 75)))
       (menu-bar-mode -1)
       (scroll-bar-mode -1)
       (global-linum-mode 1)
       (tool-bar-mode -1)
+      (straight-use-package 'modus-operandi-theme)
+      (straight-use-package 'modus-vivendi-theme)
+      (load-theme 'modus-vivendi t)
       (setq org-startup-with-inline-images t)
-      (setq initial-frame-alist
-	    '(
-	      (width . 106)
-	      (height . 56)
-	      )))
-    (straight-use-package 'modus-operandi-theme)
-    (straight-use-package 'modus-vivendi-theme)
-    (load-theme 'modus-vivendi t)
-    (display-time-mode 1)
-    ;; 字体设置
-    (when (graphic-p)
-      (let ((emacs-font-size 14)
-	    (emacs-font-name "OperatorMono Nerd Font"))
-	(set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
-	(set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
-      (with-eval-after-load 'org
-	(defun org-buffer-face-mode-variable ()
-	  (interactive)
-	  (make-face 'width-font-face)
-	  (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
-	  (setq buffer-face-mode-face 'width-font-face)
-	  (buffer-face-mode))
-	(add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
+      ;;      (setq initial-frame-alist
+      ;;	    '(
+      ;;	      (width . 106)
+      ;;	      (height . 56)
+      ;;	      )))
+      )
+      (display-time-mode 1)
+      ;; 字体设置
+      (when (graphic-p)
+	(let ((emacs-font-size 14)
+	      (emacs-font-name "OperatorMono Nerd Font"))
+	  (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
+	  (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
+	(with-eval-after-load 'org
+	  (defun org-buffer-face-mode-variable ()
+	    (interactive)
+	    (make-face 'width-font-face)
+	    (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
+	    (setq buffer-face-mode-face 'width-font-face)
+	    (buffer-face-mode))
+	  (add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
   #+end_src
 * Editor
   #+begin_src emacs-lisp
