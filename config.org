@@ -1,8 +1,8 @@
 #+title: 我的Emacs配置
 #+author: keke
 #+email: liushike1997@gmail.com
-#+date: <2020-04-17 Fri>
-#+export_file_name: ~/keke-cute.github.io/blog/myemacsconf.html
+#+date: <2020-09-09 Wed>
+#+export_file_name: ~/src/keke-cute.github.io/blog/myemacsconf.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/m-dark.css" />
 #+HTML_HEAD_EXTRA: <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,400i,600%7CSource+Sans+Pro:400,400i,600&amp;subset=latin-ext" />
@@ -27,6 +27,7 @@
     (straight-use-package 'use-package)
     (straight-use-package 'magit)
     (straight-use-package 'markdown-mode)
+    (straight-use-package 'vterm)
   #+end_src
 * Is A?
   #+begin_src emacs-lisp
@@ -48,9 +49,6 @@
       (scroll-bar-mode -1)
       (global-linum-mode 1)
       (tool-bar-mode -1)
-      (straight-use-package 'modus-operandi-theme)
-      (straight-use-package 'modus-vivendi-theme)
-      (load-theme 'modus-vivendi t)
       (setq org-startup-with-inline-images t)
       ;;      (setq initial-frame-alist
       ;;	    '(
@@ -142,7 +140,33 @@
 	   (default-input-method "rime")
 	   (rime-show-candidate 'posframe))))
    #+end_src
-** vterm
+** circadian
    #+begin_src emacs-lisp
-     (straight-use-package 'vterm)
+     (straight-use-package 'modus-operandi-theme)
+     (straight-use-package 'modus-vivendi-theme)
+     (straight-use-package 'circadian)
+     (use-package
+       circadian
+       :config
+       ;; 经纬度，可以在https://www.latlong.net/获取，默认是广州的
+       (setq calendar-latitude 35.388779
+	     calendar-longitude 116.084290)
+       ;; sunrise 白天用的主题 sunset 晚上用的主题
+       (setq circadian-themes '((:sunrise . modus-operandi)
+				(:sunset . modus-vivendi)))
+       (circadian-setup))
+   #+end_src
+** helm
+   #+begin_src emacs-lisp
+     (straight-use-package 'helm)
+     (global-set-key (kbd "M-x") #'helm-M-x)
+     (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+     (global-set-key (kbd "C-x C-f") #'helm-find-files)
+     (helm-mode 1)
+   #+end_src
+** ace-window
+   #+begin_src emacs-lisp
+     (straight-use-package 'ace-window)
+     (global-set-key (kbd "M-o") 'ace-window)
+     (setq aw-dispatch-always t)
    #+end_src
