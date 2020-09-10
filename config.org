@@ -26,8 +26,9 @@
   #+begin_src emacs-lisp
     (straight-use-package 'use-package)
     (straight-use-package 'magit)
-    (straight-use-package 'markdown-mode)
     (straight-use-package 'vterm)
+    (straight-use-package 'terraform-mode)
+
   #+end_src
 * Is A?
   #+begin_src emacs-lisp
@@ -56,21 +57,28 @@
       ;;	      (height . 56)
       ;;	      )))
       )
-      (display-time-mode 1)
-      ;; 字体设置
-      (when (graphic-p)
-	(let ((emacs-font-size 14)
-	      (emacs-font-name "OperatorMono Nerd Font"))
-	  (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
-	  (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
-	(with-eval-after-load 'org
-	  (defun org-buffer-face-mode-variable ()
-	    (interactive)
-	    (make-face 'width-font-face)
-	    (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
-	    (setq buffer-face-mode-face 'width-font-face)
-	    (buffer-face-mode))
-	  (add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
+    (display-time-mode 1)
+    ;; 指定模式禁用行号
+    (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
+    (defun my-inhibit-global-linum-mode ()
+      "Counter-act `global-linum-mode'."
+      (add-hook 'after-change-major-mode-hook
+		(lambda () (linum-mode 0))
+		:append :local))
+    ;; 字体设置
+    (when (graphic-p)
+      (let ((emacs-font-size 14)
+	    (emacs-font-name "OperatorMono Nerd Font"))
+	(set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
+	(set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
+      (with-eval-after-load 'org
+	(defun org-buffer-face-mode-variable ()
+	  (interactive)
+	  (make-face 'width-font-face)
+	  (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
+	  (setq buffer-face-mode-face 'width-font-face)
+	  (buffer-face-mode))
+	(add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
   #+end_src
 * Editor
   #+begin_src emacs-lisp
