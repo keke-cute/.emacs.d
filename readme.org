@@ -1,7 +1,7 @@
-#+title: 我的Emacs配置
+#+title: My Emacs Configure
 #+author: keke
 #+email: liushike1997@gmail.com
-#+date: <2020-09-09 Wed>
+#+date: <2020-09-13 Sun>
 #+export_file_name: ~/src/keke-cute.github.io/blog/myemacsconf.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/m-dark.css" />
@@ -84,6 +84,12 @@
 	  (setq buffer-face-mode-face 'width-font-face)
 	  (buffer-face-mode))
 	(add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
+
+    (if (version< "27.0" emacs-version)
+	(set-fontset-font
+	 "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
+      (set-fontset-font
+       t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
   #+end_src
 * Editor
   #+begin_src emacs-lisp
