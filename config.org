@@ -42,11 +42,15 @@
   #+end_src
 * UI
   #+begin_src emacs-lisp
+    (when (memq window-system '(mac ns))
+      (add-to-list 'default-frame-alist '(ns-appearance . dark)) ; nil for dark text
+      (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
+
     (when (graphic-p)
       ;;  (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
       ;;  (add-to-list 'default-frame-alist'(ns-appearance . dark))
       ;;  (add-to-list 'default-frame-alist'(alpha . (80 . 75)))
-      (menu-bar-mode -1)
+      (menu-bar-mode 1)
       (scroll-bar-mode -1)
       (global-linum-mode 1)
       (tool-bar-mode -1)
@@ -178,4 +182,10 @@
      (straight-use-package 'ace-window)
      (global-set-key (kbd "M-o") 'ace-window)
      (setq aw-dispatch-always t)
+   #+end_src
+** exec-path-from-shell
+   #+begin_src emacs-lisp
+     (straight-use-package 'exec-path-from-shell)
+     (when (memq window-system '(mac ns x))
+       (exec-path-from-shell-initialize))
    #+end_src
