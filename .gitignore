@@ -2,7 +2,7 @@ straight/
 auto-save-list/
 transient/
 .lsp-session-v1
-config.el
+readme.el
 .cache/
 recentf
 bookmarks
