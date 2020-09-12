@@ -1,6 +1,6 @@
 (require 'org-install)
 (require 'ob-tangle)
-(org-babel-load-file (expand-file-name "config.org" user-emacs-directory))
+(org-babel-load-file (expand-file-name "readme.org" user-emacs-directory))
 (put 'upcase-region 'disabled nil)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
