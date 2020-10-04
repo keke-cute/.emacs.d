@@ -43,15 +43,16 @@
   #+end_src
 * UI
   #+begin_src emacs-lisp
-    (when (memq window-system '(mac ns))
-      (add-to-list 'default-frame-alist '(ns-appearance . dark)) ; nil for dark text
-      (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
+    ;; if i use emacs-plus
+    ;;(when (memq window-system '(mac ns))
+      ;;(add-to-list 'default-frame-alist '(ns-appearance . dark)) ; nil for dark text
+      ;;(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
     (when (graphic-p)
       ;;  (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
       ;;  (add-to-list 'default-frame-alist'(ns-appearance . dark))
       ;;  (add-to-list 'default-frame-alist'(alpha . (80 . 75)))
-      (menu-bar-mode 1)
+      (menu-bar-mode -1)
       (scroll-bar-mode -1)
       (global-linum-mode 1)
       (tool-bar-mode -1)
@@ -147,19 +148,6 @@
        :config
        (which-key-mode))
    #+end_src
-** emacs-rime
-   #+begin_src emacs-lisp
-     (when (graphic-p)
-       (when *is-a-linux*
-	 (use-package rime
-	   :straight (rime :type git
-			   :host github
-			   :repo "DogLooksGood/emacs-rime"
-			   :files ("*.el" "Makefile" "lib.c"))
-	   :custom
-	   (default-input-method "rime")
-	   (rime-show-candidate 'posframe))))
-   #+end_src
 ** circadian
    #+begin_src emacs-lisp
      (straight-use-package 'modus-operandi-theme)
@@ -178,11 +166,11 @@
    #+end_src
 ** helm
    #+begin_src emacs-lisp
-     (straight-use-package 'helm)
-     (global-set-key (kbd "M-x") #'helm-M-x)
-     (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-     (global-set-key (kbd "C-x C-f") #'helm-find-files)
-     (helm-mode 1)
+     ;;(straight-use-package 'helm)
+     ;;(global-set-key (kbd "M-x") #'helm-M-x)
+     ;;(global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+     ;;(global-set-key (kbd "C-x C-f") #'helm-find-files)
+     ;;(helm-mode 1)
    #+end_src
 ** ace-window
    #+begin_src emacs-lisp
@@ -192,7 +180,8 @@
    #+end_src
 ** exec-path-from-shell
    #+begin_src emacs-lisp
-     (straight-use-package 'exec-path-from-shell)
-     (when (memq window-system '(mac ns x))
-       (exec-path-from-shell-initialize))
+     ;;if i use emacs-plus
+     ;;(straight-use-package 'exec-path-from-shell)
+     ;;(when (memq window-system '(mac ns x))
+     ;;(exec-path-from-shell-initialize))
    #+end_src
