@@ -35,6 +35,9 @@
   #+begin_src emacs-lisp
     (defconst *is-a-mac* (eq system-type 'darwin))
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
+    ;; if the default directory not '~/',fix it.
+    (when *is-a-mac*
+      (setq command-line-default-directory "~/"))
   #+end_src
 * Is graphic?
   #+begin_src emacs-lisp
@@ -43,11 +46,13 @@
   #+end_src
 * UI
   #+begin_src emacs-lisp
+    ;; teansparent title(mac only)
     (when (memq window-system '(mac ns))
       (add-to-list 'default-frame-alist '(ns-appearance . dark)) ; nil for dark text
       (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
 
     (when (graphic-p)
+      ;;  transparent frame
       ;;  (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
       ;;  (add-to-list 'default-frame-alist'(ns-appearance . dark))
       ;;  (add-to-list 'default-frame-alist'(alpha . (80 . 75)))
@@ -56,6 +61,7 @@
       (global-linum-mode 1)
       (tool-bar-mode -1)
       (setq org-startup-with-inline-images t)
+      ;; default frame size
       ;;      (setq initial-frame-alist
       ;;	    '(
       ;;	      (width . 106)
@@ -192,6 +198,7 @@
    #+end_src
 ** exec-path-from-shell
    #+begin_src emacs-lisp
+     ;; if macos can't use path, fix it
      (straight-use-package 'exec-path-from-shell)
      (when (memq window-system '(mac ns x))
        (exec-path-from-shell-initialize))
