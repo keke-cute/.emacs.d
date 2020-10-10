@@ -78,8 +78,8 @@
 		:append :local))
     ;; 字体设置
     (when (graphic-p)
-      (let ((emacs-font-size 16)
-	    (emacs-font-name "OperatorMono Nerd Font"))
+      (let ((emacs-font-size 13)
+	    (emacs-font-name "Rec Mono Linear"))
 	(set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
 	(set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
       (with-eval-after-load 'org
