@@ -45,7 +45,6 @@
   #+end_src
 * UI
   #+begin_src emacs-lisp
-
     (when (graphic-p)
       ;;  transparent frame
       (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
@@ -97,6 +96,28 @@
 	 "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
       (set-fontset-font
        t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+    ;; theme
+    (use-package lazycat-theme
+      :load-path "~/.emacs.d/site-lisp/lazycat-theme")
+    (straight-use-package 'modus-operandi-theme)
+    (straight-use-package 'modus-vivendi-theme)
+    (straight-use-package 'circadian)
+    (use-package
+      circadian
+      :config
+      ;; 经纬度，可以在https://www.latlong.net/获取，默认是广州的
+      (setq calendar-latitude 35.388779
+	    calendar-longitude 116.084290)
+      ;; sunrise 白天用的主题 sunset 晚上用的主题
+      (setq circadian-themes '((:sunrise . lazycat-light)
+			       (:sunset . lazycat-dark)))
+      (circadian-setup))
+    ;; mode-line
+    (use-package awesome-tray
+      :load-path "~/.emacs.d/site-lisp/awesome-tray"
+      :init
+      (require 'awesome-tray)
+      (awesome-tray-mode 1))
   #+end_src
 * Editor
   #+begin_src emacs-lisp
@@ -118,14 +139,6 @@
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
 * Package
-** awesome-tray
-   #+begin_src emacs-lisp
-     (use-package awesome-tray
-       :load-path "~/.emacs.d/site-lisp/awesome-tray"
-       :init
-       (require 'awesome-tray)
-       (awesome-tray-mode 1))
-   #+end_src
 ** Roam
    #+begin_src emacs-lisp
      ;;(straight-use-package 'org-roam)
@@ -174,22 +187,6 @@
 	   :custom
 	   (default-input-method "rime")
 	   (rime-show-candidate 'posframe))))
-   #+end_src
-** circadian
-   #+begin_src emacs-lisp
-     (straight-use-package 'modus-operandi-theme)
-     (straight-use-package 'modus-vivendi-theme)
-     (straight-use-package 'circadian)
-     (use-package
-       circadian
-       :config
-       ;; 经纬度，可以在https://www.latlong.net/获取，默认是广州的
-       (setq calendar-latitude 35.388779
-	     calendar-longitude 116.084290)
-       ;; sunrise 白天用的主题 sunset 晚上用的主题
-       (setq circadian-themes '((:sunrise . modus-operandi)
-				(:sunset . modus-vivendi)))
-       (circadian-setup))
    #+end_src
 ** helm
    #+begin_src emacs-lisp
