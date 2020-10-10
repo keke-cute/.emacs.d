@@ -1,0 +1,3 @@
+[submodule "site-lisp"]
+	path = site-lisp
+	url = https://github.com/manateelazycat/awesome-tray.git
