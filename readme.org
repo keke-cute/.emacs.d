@@ -29,7 +29,6 @@
     (straight-use-package 'magit)
     (straight-use-package 'vterm)
     (straight-use-package 'terraform-mode)
-
   #+end_src
 * Is A?
   #+begin_src emacs-lisp
@@ -119,6 +118,14 @@
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
 * Package
+** awesome-tray
+   #+begin_src emacs-lisp
+     (use-package awesome-tray
+       :load-path "~/.emacs.d/site-lisp/awesome-tray"
+       :init
+       (require 'awesome-tray)
+       (awesome-tray-mode 1))
+   #+end_src
 ** Roam
    #+begin_src emacs-lisp
      ;;(straight-use-package 'org-roam)
