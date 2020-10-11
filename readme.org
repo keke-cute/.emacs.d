@@ -175,7 +175,7 @@
        (ivy-posframe-border-width 2)
        (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
        :custom-face
-     ;;  (ivy-posframe ((t (:background "#282a36"))))
+       (ivy-posframe ((t (:background "#000000"))))
        (ivy-posframe-border ((t (:background "#6272a4"))))
        (ivy-posframe-cursor ((t (:background "#61bfff"))))
        :config
