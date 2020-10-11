@@ -40,9 +40,6 @@
   #+begin_src emacs-lisp
     (defconst *is-a-mac* (eq system-type 'darwin))
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
-    ;; if the default directory not '~/',fix it.
-    (when *is-a-mac*
-      (setq command-line-default-directory "~/"))
   #+end_src
 * Is graphic?
   #+begin_src emacs-lisp
@@ -71,12 +68,6 @@
       ;;	      )))
       )
     (display-time-mode 1)
-    ;; teansparent title(mac only)
-    (when (memq window-system '(mac ns))
-      (menu-bar-mode 1)
-      (add-to-list 'default-frame-alist '(ns-appearance . dark)) ; nil for dark text
-      (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t)))
-
     ;; 指定模式禁用行号
     (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
     (defun my-inhibit-global-linum-mode ()
@@ -175,44 +166,20 @@
      (global-set-key (kbd "C-x l") 'counsel-locate)
      (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
      (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
-     (require 'ivy-posframe)
-     ;; display at `ivy-posframe-style'
-     (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
-     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
-     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
-     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
-     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
-     (ivy-posframe-mode 1)
-   #+end_src
-** Roam
-   #+begin_src emacs-lisp
-     ;;(straight-use-package 'org-roam)
-     ;;(straight-use-package 'org-roam-server)
-     ;;(use-package org-roam
-     ;;  :hook
-     ;;  (after-init . org-roam-mode)
-     ;;  :custom
-     ;;  (org-roam-directory "~/src/org/roam")
-     ;;  :bind (:map org-roam-mode-map
-     ;;	      (("C-c n l" . org-roam)
-     ;;	       ("C-c n f" . org-roam-find-file)
-     ;;	       ("C-c n g" . org-roam-graph-show))
-     ;;	      :map org-mode-map
-     ;;	      (("C-c n i" . org-roam-insert))
-     ;;	      (("C-c n I" . org-roam-insert-immediate))))
-     ;;(use-package org-roam-server
-     ;;  :config
-     ;;  (setq org-roam-server-host "127.0.0.1"
-     ;;      org-roam-server-port 9090
-     ;;      org-roam-server-export-inline-images t
-     ;;      org-roam-server-authenticate nil
-     ;;      org-roam-server-label-truncate t
-     ;;      org-roam-server-label-truncate-length 60
-     ;;      org-roam-server-label-wrap-length 20)
-     ;;  (org-roam-server-mode)
-     ;;  (require 'org-roam-protocol))
-     ;;
+     (use-package ivy-posframe
+       :custom
+       (ivy-posframe-font "Rec Mono Linear-15")
+       (ivy-posframe-parameters
+	'((left-fringe . 5)
+	  (right-fringe . 5)))
+       (ivy-posframe-border-width 2)
+       (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+       :custom-face
+     ;;  (ivy-posframe ((t (:background "#282a36"))))
+       (ivy-posframe-border ((t (:background "#6272a4"))))
+       (ivy-posframe-cursor ((t (:background "#61bfff"))))
+       :config
+       (ivy-posframe-mode 1))
    #+end_src
 ** Which-key
    #+begin_src emacs-lisp
@@ -234,24 +201,9 @@
 	   (default-input-method "rime")
 	   (rime-show-candidate 'posframe))))
    #+end_src
-** helm
-   #+begin_src emacs-lisp
-     ;;(straight-use-package 'helm)
-     ;;(global-set-key (kbd "M-x") #'helm-M-x)
-     ;;(global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-     ;;(global-set-key (kbd "C-x C-f") #'helm-find-files)
-     ;;(helm-mode 1)
-   #+end_src
 ** ace-window
    #+begin_src emacs-lisp
      (straight-use-package 'ace-window)
      (global-set-key (kbd "M-o") 'ace-window)
      (setq aw-dispatch-always t)
-   #+end_src
-** exec-path-from-shell
-   #+begin_src emacs-lisp
-     ;; if macos can't use path, fix it
-     (straight-use-package 'exec-path-from-shell)
-     (when (memq window-system '(mac ns x))
-       (exec-path-from-shell-initialize))
    #+end_src
