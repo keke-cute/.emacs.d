@@ -217,6 +217,7 @@
      (global-set-key (kbd "C-x l") 'counsel-locate)
      (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
      (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+     (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
      (use-package ivy-posframe
        :custom
        (ivy-posframe-font "Rec Mono Linear-15")
