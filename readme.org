@@ -194,7 +194,6 @@
      (straight-use-package 'swiper)
      (straight-use-package 'counsel)
      (straight-use-package 'ivy-posframe)
-     (straight-use-package 'all-the-icons-ivy-rich)
 
      (ivy-mode 1)
      (setq ivy-use-virtual-buffers t)
@@ -220,7 +219,7 @@
      (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
      (use-package ivy-posframe
        :custom
-       (ivy-posframe-font "Rec Mono Linear-10")
+       (ivy-posframe-font "Rec Mono Linear-15")
        (ivy-posframe-parameters
 	'((left-fringe . 5)
 	  (right-fringe . 5)))
@@ -232,12 +231,6 @@
        (ivy-posframe-cursor ((t (:background "#61bfff"))))
        :config
        (ivy-posframe-mode 1))
-
-     (use-package all-the-icons-ivy-rich
-       :init (all-the-icons-ivy-rich-mode 1))
-
-     (use-package ivy-rich
-       :init (ivy-rich-mode 1))
    #+end_src
 ** Which-key
    #+begin_src emacs-lisp
