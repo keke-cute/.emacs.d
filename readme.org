@@ -79,7 +79,7 @@
     (when (graphic-p)
       (let ((emacs-font-size 13)
 	    (emacs-font-name "Rec Mono Linear"))
-	(set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
+	(set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
 	(set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
       (with-eval-after-load 'org
 	(defun org-buffer-face-mode-variable ()
@@ -159,6 +159,10 @@
    #+begin_src emacs-lisp
      (straight-use-package 'lsp-mode)
      (straight-use-package 'go-mode)
+     (straight-use-package 'lsp-ui)
+     (straight-use-package 'flycheck)
+     (straight-use-package 'flycheck-posframe)
+
      (use-package lsp-mode
        :commands lsp
        :hook ((go-mode) . lsp)
@@ -170,10 +174,19 @@
        (lsp-eldoc-hook nil)
        (lsp-prefer-flymake nil)
        :bind (:map lsp-mode-map
-			       ("C-c C-f" . lsp-format-buffer)
-			       ("M-RET" . lsp-ui-sideline-apply-code-actions))
+		   ("C-c C-f" . lsp-format-buffer)
+		   ("M-RET" . lsp-ui-sideline-apply-code-actions))
        :config
        (setq lsp-prefer-capf t))
+
+     (use-package lsp-ui :commands lsp-ui-mode)
+
+     (use-package flycheck
+       :init (global-flycheck-mode))
+
+     (use-package flycheck-posframe
+       :after flycheck
+       :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
    #+end_src
 ** Ivy
    #+begin_src emacs-lisp
@@ -181,6 +194,8 @@
      (straight-use-package 'swiper)
      (straight-use-package 'counsel)
      (straight-use-package 'ivy-posframe)
+     (straight-use-package 'all-the-icons-ivy-rich)
+
      (ivy-mode 1)
      (setq ivy-use-virtual-buffers t)
      (setq enable-recursive-minibuffers t)
@@ -205,7 +220,7 @@
      (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
      (use-package ivy-posframe
        :custom
-       (ivy-posframe-font "Rec Mono Linear-15")
+       (ivy-posframe-font "Rec Mono Linear-10")
        (ivy-posframe-parameters
 	'((left-fringe . 5)
 	  (right-fringe . 5)))
@@ -217,6 +232,12 @@
        (ivy-posframe-cursor ((t (:background "#61bfff"))))
        :config
        (ivy-posframe-mode 1))
+
+     (use-package all-the-icons-ivy-rich
+       :init (all-the-icons-ivy-rich-mode 1))
+
+     (use-package ivy-rich
+       :init (ivy-rich-mode 1))
    #+end_src
 ** Which-key
    #+begin_src emacs-lisp
