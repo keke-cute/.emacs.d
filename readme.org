@@ -1,7 +1,7 @@
 #+title: My Emacs Configure
 #+author: keke
 #+email: liushike1997@gmail.com
-#+date: <2020-09-13 Sun>
+#+date: <2020-10-13 Tue>
 #+export_file_name: ~/Src/keke-cute.github.io/blog/myemacsconf.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/m-dark.css" />
@@ -47,77 +47,85 @@
       (display-graphic-p))
   #+end_src
 * UI
-  #+begin_src emacs-lisp
-    (when (graphic-p)
-      ;;  transparent frame
-      (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
-      (add-to-list 'default-frame-alist'(ns-appearance . dark))
-      (add-to-list 'default-frame-alist'(alpha . (80 . 75)))
-      (menu-bar-mode -1)
-      (scroll-bar-mode -1)
-      (global-linum-mode 1)
-      (tool-bar-mode -1)
-      (global-hl-line-mode t)
-      (setq inhibit-splash-screen t)
-      (setq org-startup-with-inline-images t)
-      ;; default frame size
-      ;;      (setq initial-frame-alist
-      ;;	    '(
-      ;;	      (width . 106)
-      ;;	      (height . 56)
-      ;;	      )))
-      )
-    (display-time-mode 1)
-    ;; 指定模式禁用行号
-    (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
-    (defun my-inhibit-global-linum-mode ()
-      "Counter-act `global-linum-mode'."
-      (add-hook 'after-change-major-mode-hook
-		(lambda () (linum-mode 0))
-		:append :local))
-    ;; 字体设置
-    (when (graphic-p)
-      (let ((emacs-font-size 13)
-	    (emacs-font-name "Rec Mono Linear"))
-	(set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
-	(set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
-      (with-eval-after-load 'org
-	(defun org-buffer-face-mode-variable ()
-	  (interactive)
-	  (make-face 'width-font-face)
-	  (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
-	  (setq buffer-face-mode-face 'width-font-face)
-	  (buffer-face-mode))
-	(add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
+** Main UI
+   #+begin_src emacs-lisp
+     (when (graphic-p)
+       ;;  transparent frame
+       (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
+       (add-to-list 'default-frame-alist'(ns-appearance . dark))
+       (add-to-list 'default-frame-alist'(alpha . (80 . 75)))
+       (menu-bar-mode -1)
+       (scroll-bar-mode -1)
+       (global-linum-mode 1)
+       (tool-bar-mode -1)
+       (global-hl-line-mode t)
+       (setq inhibit-splash-screen t)
+       (setq org-startup-with-inline-images t)
+       ;; default frame size
+       ;;      (setq initial-frame-alist
+       ;;	    '(
+       ;;	      (width . 106)
+       ;;	      (height . 56)
+       ;;	      )))
+       )
+     (display-time-mode 1)
+     ;; 指定模式禁用行号
+     (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'eshell-mode-hook 'my-inhibit-global-linum-mode)
+     (defun my-inhibit-global-linum-mode ()
+       "Counter-act `global-linum-mode'."
+       (add-hook 'after-change-major-mode-hook
+		 (lambda () (linum-mode 0))
+		 :append :local))
+   #+end_src
+** Font
+   #+begin_src emacs-lisp
+     ;; 字体设置
+     (when (graphic-p)
+       (let ((emacs-font-size 13)
+	     (emacs-font-name "Rec Mono Linear"))
+	 (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
+	 (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
+       (with-eval-after-load 'org
+	 (defun org-buffer-face-mode-variable ()
+	   (interactive)
+	   (make-face 'width-font-face)
+	   (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
+	   (setq buffer-face-mode-face 'width-font-face)
+	   (buffer-face-mode))
+	 (add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
 
-    (if (version< "27.0" emacs-version)
-	(set-fontset-font
-	 "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
-      (set-fontset-font
-       t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
-    ;; theme
-    (use-package lazycat-theme
-      :load-path "~/.emacs.d/site-lisp/lazycat-theme")
-    (straight-use-package 'modus-operandi-theme)
-    (straight-use-package 'modus-vivendi-theme)
-    (straight-use-package 'circadian)
-    (use-package
-      circadian
-      :config
-      ;; 经纬度，可以在https://www.latlong.net/获取，默认是广州的
-      (setq calendar-latitude 35.388779
-	    calendar-longitude 116.084290)
-      ;; sunrise 白天用的主题 sunset 晚上用的主题
-      (setq circadian-themes '((:sunrise . lazycat-light)
-			       (:sunset . lazycat-dark)))
-      (circadian-setup))
-    ;; mode-line
-    (use-package awesome-tray
-      :load-path "~/.emacs.d/site-lisp/awesome-tray"
-      :init
-      (require 'awesome-tray)
-      (awesome-tray-mode 1))
-  #+end_src
+     (if (version< "27.0" emacs-version)
+	 (set-fontset-font
+	  "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
+       (set-fontset-font
+	t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+   #+end_src
+** Theme & Modeline
+   #+begin_src emacs-lisp
+     ;; theme
+     (use-package lazycat-theme
+       :load-path "~/.emacs.d/site-lisp/lazycat-theme")
+     (straight-use-package 'modus-operandi-theme)
+     (straight-use-package 'modus-vivendi-theme)
+     (straight-use-package 'circadian)
+     (use-package
+       circadian
+       :config
+       ;; 经纬度，可以在https://www.latlong.net/获取，默认是广州的
+       (setq calendar-latitude 35.388779
+	     calendar-longitude 116.084290)
+       ;; sunrise 白天用的主题 sunset 晚上用的主题
+       (setq circadian-themes '((:sunrise . lazycat-light)
+				(:sunset . lazycat-dark)))
+       (circadian-setup))
+     ;; mode-line
+     (use-package awesome-tray
+       :load-path "~/.emacs.d/site-lisp/awesome-tray"
+       :init
+       (require 'awesome-tray)
+       (awesome-tray-mode 1))
+   #+end_src
 * Editor
   #+begin_src emacs-lisp
     ;; 自动加载外部修改过的文件
@@ -138,6 +146,18 @@
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
 * Package
+** FlyCheck
+   #+begin_src emacs-lisp
+     (straight-use-package 'flycheck)
+     (straight-use-package 'flycheck-posframe)
+
+     (use-package flycheck
+       :init (global-flycheck-mode))
+
+     (use-package flycheck-posframe
+       :after flycheck
+       :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+   #+end_src
 ** Company
    #+begin_src emacs-lisp
      (straight-use-package 'company)
@@ -160,9 +180,6 @@
      (straight-use-package 'lsp-mode)
      (straight-use-package 'go-mode)
      (straight-use-package 'lsp-ui)
-     (straight-use-package 'flycheck)
-     (straight-use-package 'flycheck-posframe)
-
      (use-package lsp-mode
        :commands lsp
        :hook ((go-mode) . lsp)
@@ -181,12 +198,6 @@
 
      (use-package lsp-ui :commands lsp-ui-mode)
 
-     (use-package flycheck
-       :init (global-flycheck-mode))
-
-     (use-package flycheck-posframe
-       :after flycheck
-       :config (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
    #+end_src
 ** Ivy
    #+begin_src emacs-lisp
@@ -217,7 +228,6 @@
      (global-set-key (kbd "C-x l") 'counsel-locate)
      (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
      (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
-     (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))
      (use-package ivy-posframe
        :custom
        (ivy-posframe-font "Rec Mono Linear-15")
