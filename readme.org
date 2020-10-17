@@ -14,10 +14,6 @@
 #+begin_src shell
   git submodule update --init --recursive
 #+end_src
-* Load
-  #+begin_src emacs-lisp
-    (add-to-list 'load-path "~/.emacs.d/etc/")
-  #+end_src
 * Straight.el
   #+begin_src emacs-lisp
     (defvar bootstrap-version)
@@ -99,7 +95,7 @@
      ;;      (buffer-face-mode))
      ;;    (add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
 
-     (set-frame-font "Rec Mono Linear-13" nil t)
+     (set-frame-font "Rec Mono Linear-15" nil t)
 
      (if (version< "27.0" emacs-version)
 	 (set-fontset-font
@@ -236,7 +232,7 @@
      (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
      (use-package ivy-posframe
        :custom
-       (ivy-posframe-font "Rec Mono Linear-15")
+       (ivy-posframe-font "Rec Mono Linear-16")
        (ivy-posframe-parameters
 	'((left-fringe . 5)
 	  (right-fringe . 5)))
@@ -396,5 +392,5 @@
 * Exwm
   #+begin_src emacs-lisp
     (if (string= (system-name) "KeaiGuixMi")
-	(require 'init-exwm))
+	(load-file "~/.emacs.d/etc/init-exwm.el"))
   #+end_src
