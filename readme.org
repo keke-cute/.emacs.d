@@ -118,15 +118,15 @@
        (setq calendar-latitude 35.388779
 	     calendar-longitude 116.084290)
        ;; sunrise 白天用的主题 sunset 晚上用的主题
-       (setq circadian-themes '((:sunrise . lazycat-light)
-				(:sunset . lazycat-dark)))
+       (setq circadian-themes '((:sunrise . modus-operandi)
+				(:sunset . modus-vivendi)))
        (circadian-setup))
      ;; mode-line
-     (use-package awesome-tray
-       :load-path "~/.emacs.d/site-lisp/awesome-tray"
-       :init
-       (require 'awesome-tray)
-       (awesome-tray-mode 1))
+     ;; (use-package awesome-tray
+     ;;   :load-path "~/.emacs.d/site-lisp/awesome-tray"
+     ;;   :init
+     ;;   (require 'awesome-tray)
+     ;;   (awesome-tray-mode 1))
    #+end_src
 * Editor
   #+begin_src emacs-lisp
@@ -230,20 +230,20 @@
      (global-set-key (kbd "C-x l") 'counsel-locate)
      (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
      (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
-     (use-package ivy-posframe
-       :custom
-       (ivy-posframe-font "Rec Mono Linear-16")
-       (ivy-posframe-parameters
-	'((left-fringe . 5)
-	  (right-fringe . 5)))
-       (ivy-posframe-border-width 2)
-       (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-       :custom-face
-       (ivy-posframe ((t (:background "#000000"))))
-       (ivy-posframe-border ((t (:background "#6272a4"))))
-       (ivy-posframe-cursor ((t (:background "#61bfff"))))
-       :config
-       (ivy-posframe-mode 1))
+     ;; (use-package ivy-posframe
+     ;;   :custom
+     ;;   (ivy-posframe-font "Rec Mono Linear-16")
+     ;;   (ivy-posframe-parameters
+     ;;    '((left-fringe . 5)
+     ;;      (right-fringe . 5)))
+     ;;   (ivy-posframe-border-width 2)
+     ;;   (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+     ;;   :custom-face
+     ;;   (ivy-posframe ((t (:background "#000000"))))
+     ;;   (ivy-posframe-border ((t (:background "#6272a4"))))
+     ;;   (ivy-posframe-cursor ((t (:background "#61bfff"))))
+     ;;   :config
+     ;;   (ivy-posframe-mode 1))
    #+end_src
 ** Which-key
    #+begin_src emacs-lisp
