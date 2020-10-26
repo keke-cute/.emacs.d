@@ -72,6 +72,8 @@
      ;; 指定模式禁用行号
      (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
      (add-hook 'eshell-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'telega-root-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'telega-chat-mode-hook 'my-inhibit-global-linum-mode)
      (defun my-inhibit-global-linum-mode ()
        "Counter-act `global-linum-mode'."
        (add-hook 'after-change-major-mode-hook
@@ -80,22 +82,20 @@
    #+end_src
 ** Font
    #+begin_src emacs-lisp
-     ;; 字体设置
-     ;;(when (graphic-p)
-     ;;  (let ((emacs-font-size 13)
-     ;;	(emacs-font-name "Rec Mono Linear"))
-     ;;    (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
-     ;;    (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
-     ;;  (with-eval-after-load 'org
-     ;;    (defun org-buffer-face-mode-variable ()
-     ;;      (interactive)
-     ;;      (make-face 'width-font-face)
-     ;;      (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
-     ;;      (setq buffer-face-mode-face 'width-font-face)
-     ;;      (buffer-face-mode))
-     ;;    (add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
-
-     (set-frame-font "Rec Mono Linear-15" nil t)
+     ;;字体设置
+     (when (graphic-p)
+       (let ((emacs-font-size 13)
+	     (emacs-font-name "Rec Mono Linear"))
+	 (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
+	 (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
+       (with-eval-after-load 'org
+	 (defun org-buffer-face-mode-variable ()
+	   (interactive)
+	   (make-face 'width-font-face)
+	   (set-face-attribute 'width-font-face nil :font "Sarasa Mono SC 15")
+	   (setq buffer-face-mode-face 'width-font-face)
+	   (buffer-face-mode))
+	 (add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
 
      (if (version< "27.0" emacs-version)
 	 (set-fontset-font
@@ -388,6 +388,30 @@
 		   (shell-command $cmdStr $outBuffer ))
 	       (error "No recognized program file suffix for this file."))))
 	 (run-hooks 'xah-run-current-file-after-hook)))
+   #+end_src
+** Telega
+   #+begin_src emacs-lisp
+     (straight-use-package 'telega)
+   #+end_src
+** Projectile
+   #+begin_src emacs-lisp
+     (straight-use-package 'projectile)
+     (straight-use-package 'counsel-projectile )
+
+     (use-package projectile
+       :diminish projectile-mode
+       :config (projectile-mode)
+       :custom ((projectile-completion-system 'ivy))
+       :bind-keymap
+       ("C-c p" . projectile-command-map)
+       :init
+       ;; NOTE: Set this to the folder where you keep your Git repos!
+       (when (file-directory-p "~/Projects/Code")
+	 (setq projectile-project-search-path '("~/Projects/Code")))
+       (setq projectile-switch-project-action #'projectile-dired))
+
+     (use-package counsel-projectile
+       :config (counsel-projectile-mode))
    #+end_src
 * Exwm
   #+begin_src emacs-lisp

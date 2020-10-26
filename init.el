@@ -9,7 +9,7 @@
  '(ansi-color-names-vector
    ["#FAFAFA" "#ff6c6b" "#98be65" "#ECBE7B" "#51afef" "#c678dd" "#46D9FF" "#383a42"])
  '(custom-safe-themes
-   '("e246ff6951678c835ab95aedb99a48fdd665656eadf8b8bc0a4f60e17fbc6b7e" "13ad38f22ce6b90008d07bae6f0a934e2af8218870617eba1c899def9972b646" "0662e3fbfe80821ee133053f9a68f87fa83331bc45add5f85e19633597d41ffc" "2eefac73fe17cd822d564ad5a2c932d91fd540205f567a7696af2deefbd94292" default))
+   '("7d94e2c39830e0597f66f1f794c05e87e3253ca73188e98f12f770681e9d6bac" "7be5c904ab89af341a06fa146844d4f96ffb58c39290c45a5ac2c0ddb5a346cc" "e246ff6951678c835ab95aedb99a48fdd665656eadf8b8bc0a4f60e17fbc6b7e" "13ad38f22ce6b90008d07bae6f0a934e2af8218870617eba1c899def9972b646" "0662e3fbfe80821ee133053f9a68f87fa83331bc45add5f85e19633597d41ffc" "2eefac73fe17cd822d564ad5a2c932d91fd540205f567a7696af2deefbd94292" default))
  '(fci-rule-color "#5B6268")
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
