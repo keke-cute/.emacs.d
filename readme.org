@@ -2,12 +2,7 @@
 #+author: keke
 #+email: liushike1997@gmail.com
 #+date: <2020-10-13 Tue>
-#+export_file_name: ~/Src/keke-cute.github.io/blog/myemacsconf.html
-#+options: creator:t author:t
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/m-dark.css" />
-#+HTML_HEAD_EXTRA: <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,400i,600%7CSource+Sans+Pro:400,400i,600&amp;subset=latin-ext" />
-#+HTML_HEAD_EXTRA: <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-#+OPTIONS: html-style:nil
+#+export_file_name: ~/Repos/keke-cute.github.io/blog/myemacsconf.html
 [[https://raw.githubusercontent.com/keke-cute/.emacs.d/master/2020-10-11_17-31.png]]
 - this is my curreent emacs config, old archive see other branch
 - git clone me, and run:
@@ -258,14 +253,12 @@
 		   ("C-n" . #'company-select-next) 
 		   ("C-p" . #'company-select-previous)))
    #+end_src
-** Lsp(include go)
+** Lsp
    #+begin_src emacs-lisp
      (straight-use-package 'lsp-mode)
-     (straight-use-package 'go-mode)
      (straight-use-package 'lsp-ui)
      (use-package lsp-mode
        :commands lsp
-       :hook ((go-mode) . lsp)
        :custom
        (lsp-idle-delay 1200)
        (lsp-auto-guess-root nil)
@@ -493,6 +486,20 @@
 
      (use-package counsel-projectile
        :config (counsel-projectile-mode))
+   #+end_src
+* Languages
+** Rust
+   #+begin_src emacs-lisp
+     (straight-use-package 'rust-mode)
+     (use-package rust-mode
+       :custom (lsp-rust-server 'rust-analyzer)
+       :hook (rust-mode . lsp))
+   #+end_src
+** Go
+   #+begin_src emacs-lisp
+     (straight-use-package 'go-mode)
+     (use-package rust-mode
+       :hook (go-mode . lsp))
    #+end_src
 * Exwm
   #+begin_src emacs-lisp
