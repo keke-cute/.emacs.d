@@ -3,6 +3,8 @@
 #+email: liushike1997@gmail.com
 #+date: <2020-10-13 Tue>
 #+export_file_name: ~/Repos/keke-cute.github.io/blog/myemacsconf.html
+#+options: creator:t author:t
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" />
 [[https://raw.githubusercontent.com/keke-cute/.emacs.d/master/2020-10-11_17-31.png]]
 - this is my curreent emacs config, old archive see other branch
 - git clone me, and run:
@@ -30,14 +32,12 @@
     (straight-use-package 'vterm)
     (straight-use-package 'terraform-mode)
     (straight-use-package 'posframe)
+    (straight-use-package 'htmlize)
   #+end_src
 * Is A?
   #+begin_src emacs-lisp
     (defconst *is-a-mac* (eq system-type 'darwin))
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
-  #+end_src
-* Is graphic?
-  #+begin_src emacs-lisp
     (defun graphic-p ()
       (display-graphic-p))
   #+end_src
@@ -486,6 +486,16 @@
 
      (use-package counsel-projectile
        :config (counsel-projectile-mode))
+   #+end_src
+** Yasnippet
+   #+begin_src emacs-lisp
+     (straight-use-package 'yasnippet)
+     (straight-use-package 'yasnippet-snippets)
+     (use-package yasnippet
+       :commands
+       (yas-reload-all)
+       :init
+       (add-hook 'prog-mode-hook #'yas-minor-mode))
    #+end_src
 * Languages
 ** Rust
