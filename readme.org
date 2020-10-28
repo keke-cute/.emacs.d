@@ -68,7 +68,7 @@
        ;;	      (height . 56)
        ;;	      )))
        )
-     (display-time-mode 1)
+     ;;(display-time-mode 1)
      ;; 指定模式禁用行号
      (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
      (add-hook 'eshell-mode-hook 'my-inhibit-global-linum-mode)
@@ -79,6 +79,38 @@
        (add-hook 'after-change-major-mode-hook
 		 (lambda () (linum-mode 0))
 		 :append :local))
+     ;;🌈括号
+     (straight-use-package 'rainbow-delimiters)
+     (use-package rainbow-delimiters 
+       :config
+       ;; 设置每一级括号的颜色
+       (set-face-foreground 'rainbow-delimiters-depth-1-face "orange red") 
+       (set-face-foreground 'rainbow-delimiters-depth-2-face "gold") 
+       (set-face-foreground 'rainbow-delimiters-depth-3-face "yellow") 
+       (set-face-foreground 'rainbow-delimiters-depth-4-face "spring green") 
+       (set-face-foreground 'rainbow-delimiters-depth-5-face "cyan") 
+       (set-face-foreground 'rainbow-delimiters-depth-6-face "magenta") 
+       (set-face-foreground 'rainbow-delimiters-depth-7-face "goldenrod") 
+       (set-face-foreground 'rainbow-delimiters-depth-8-face "IndianRed1") 
+       (set-face-foreground 'rainbow-delimiters-depth-9-face "ivory1") 
+       (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
+       (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
+       (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
+     ;; 
+     (straight-use-package 'highlight-indent-guides)
+     (use-package highlight-indent-guides
+       :hook ((prog-mode web-mode) . highlight-indent-guides-mode)
+       :config
+       (setq highlight-indent-guides-method (if window-system 'character 'nil))
+       (setq highlight-indent-guides-responsive 'stack))
    #+end_src
 ** Font
    #+begin_src emacs-lisp
@@ -118,15 +150,64 @@
        (setq calendar-latitude 35.388779
 	     calendar-longitude 116.084290)
        ;; sunrise 白天用的主题 sunset 晚上用的主题
-       (setq circadian-themes '((:sunrise . modus-operandi)
-				(:sunset . modus-vivendi)))
+       (setq circadian-themes '((:sunrise . lazycat-light)
+				(:sunset . lazycat-dark)))
        (circadian-setup))
-     ;; mode-line
-     ;; (use-package awesome-tray
-     ;;   :load-path "~/.emacs.d/site-lisp/awesome-tray"
-     ;;   :init
-     ;;   (require 'awesome-tray)
-     ;;   (awesome-tray-mode 1))
+
+      (use-package awesome-tray
+	:load-path "~/.emacs.d/site-lisp/awesome-tray"
+	:init
+	(require 'awesome-tray)
+	(awesome-tray-mode 1))
+
+
+
+     ;;(require 'subr-x)
+     ;;(straight-use-package 'minions)
+     ;;(defun mode-line-with-padding (text)
+     ;;  "Return TEXT with padding on the left.
+     ;;The padding pushes TEXT to the right edge of the mode-line."
+     ;;  (let* ((font (face-attribute 'mode-line :font))
+     ;;	 (glyph-list (font-get-glyphs font 0 (length text) text))
+     ;;	 (len (cl-reduce (lambda (len glyph)
+     ;;			   (+ len (aref glyph 4)))
+     ;;			 glyph-list
+     ;;			 :initial-value 0))
+     ;;	 (padding (propertize
+     ;;		   "-" 'display
+     ;;		   `(space :align-to (- (+ right right-margin) (,len))))))
+     ;;    (concat padding text)))
+     ;;
+     ;;(setq-default mode-line-format
+     ;;	      (let* ((spaces
+     ;;		      (propertize " " 'display '(space :width 1.5)))
+     ;;		     (fringe (propertize
+     ;;			      " " 'display '(space :width fringe)))
+     ;;		     (percentage
+     ;;		      '(format
+     ;;			"%d%%" (/ (* (window-end) 100.0) (point-max)))))
+     ;;		`(,fringe
+     ;;		  (:eval (if (window-dedicated-p)
+     ;;			     (concat "🔒" spaces) ""))
+     ;;		  "%[%b%]"
+     ;;		  ,spaces
+     ;;		  ,(if (featurep 'minions)
+     ;;		       'minions-mode-line-modes
+     ;;		     'mode-line-modes)
+     ;;		  ,spaces
+     ;;		  (:eval
+     ;;		   (cond (inhibit-read-only
+     ;;			  ,(if (display-graphic-p) "– ω –" "-w-"))
+     ;;			 ((buffer-modified-p)
+     ;;			  ,(if (display-graphic-p) "Φ A Φ" "OAO"))
+     ;;			 (t
+     ;;			  ,(if (display-graphic-p) "Φ ω Φ" "OwO"))))
+     ;;		  ,spaces
+     ;;		  mode-line-misc-info
+     ;;		  ,(if (display-graphic-p)
+     ;;		       `(:eval (concat (mode-line-with-padding
+     ;;					,percentage) "%%"))
+     ;;		     `(:eval (concat ,spaces ,percentage "%%"))))))
    #+end_src
 * Editor
   #+begin_src emacs-lisp
