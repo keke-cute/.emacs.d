@@ -513,6 +513,6 @@
    #+end_src
 * Exwm
   #+begin_src emacs-lisp
-    (if (string= (system-name) "KeaiGuixMi")
+    (if (string= (system-name) "KeaiGuix")
 	(load-file "~/.emacs.d/etc/init-exwm.el"))
   #+end_src
