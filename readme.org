@@ -29,7 +29,6 @@
   #+begin_src emacs-lisp
     (straight-use-package 'use-package)
     (straight-use-package 'magit)
-    (straight-use-package 'vterm)
     (straight-use-package 'terraform-mode)
     (straight-use-package 'posframe)
     (straight-use-package 'htmlize)
