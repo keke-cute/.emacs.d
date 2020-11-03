@@ -29,7 +29,6 @@
   #+begin_src emacs-lisp
     (straight-use-package 'use-package)
     (straight-use-package 'magit)
-    (straight-use-package 'terraform-mode)
     (straight-use-package 'posframe)
     (straight-use-package 'htmlize)
   #+end_src
@@ -39,6 +38,10 @@
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
     (defun graphic-p ()
       (display-graphic-p))
+
+    (if (string= (system-name) "KeaiGuix") ;; if
+	(load-file "~/.emacs.d/etc/init-guix.el") ;; then
+      (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
   #+end_src
 * UI
 ** Main UI
@@ -328,19 +331,6 @@
        :config
        (which-key-mode))
    #+end_src
-** Emacs-rime
-   #+begin_src emacs-lisp
-     (when (graphic-p)
-       (when *is-a-linux*
-	 (use-package rime
-	   :straight (rime :type git
-			   :host github
-			   :repo "DogLooksGood/emacs-rime"
-			   :files ("*.el" "Makefile" "lib.c"))
-	   :custom
-	   (default-input-method "rime")
-	   (rime-show-candidate 'posframe))))
-   #+end_src
 ** Ace-window
    #+begin_src emacs-lisp
      (straight-use-package 'ace-window)
@@ -351,10 +341,6 @@
    #+begin_src emacs-lisp
      (straight-use-package 'exec-path-from-shell)
      (exec-path-from-shell-initialize)
-   #+end_src
-** Telega
-   #+begin_src emacs-lisp
-     (straight-use-package 'telega)
    #+end_src
 ** Projectile
    #+begin_src emacs-lisp
@@ -424,8 +410,3 @@
      (use-package rust-mode
        :hook (go-mode . lsp))
    #+end_src
-* Exwm
-  #+begin_src emacs-lisp
-    (if (string= (system-name) "KeaiGuix")
-	(load-file "~/.emacs.d/etc/init-exwm.el"))
-  #+end_src
