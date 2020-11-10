@@ -108,6 +108,13 @@
        :config
        (setq highlight-indent-guides-method (if window-system 'character 'nil))
        (setq highlight-indent-guides-responsive 'stack))
+
+     (straight-use-package 'dashboard)
+     (use-package dashboard
+       :config
+       (dashboard-setup-startup-hook)
+       (setq dashboard-startup-banner "~/.emacs.d/mega.png")
+       (setq dashboard-banner-logo-title "Emacs ♥ Keke"))
    #+end_src
 ** Font
    #+begin_src emacs-lisp
