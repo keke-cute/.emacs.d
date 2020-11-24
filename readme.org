@@ -39,18 +39,18 @@
     (defun graphic-p ()
       (display-graphic-p))
 
-    (if (string= (system-name) "KeaiGuix") ;; if
-	(load-file "~/.emacs.d/etc/init-guix.el") ;; then
-      (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
+    ;; (if (string= (system-name) "KeaiGuix") ;; if
+    ;;     (load-file "~/.emacs.d/etc/init-guix.el") ;; then
+    ;;   (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
   #+end_src
 * UI
 ** Main UI
    #+begin_src emacs-lisp
      (when (graphic-p)
      ;;  transparent frame
-       (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
-       (add-to-list 'default-frame-alist'(ns-appearance . dark))
-       (add-to-list 'default-frame-alist'(alpha . (95 . 89)))
+       ;;(add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
+       ;;(add-to-list 'default-frame-alist'(ns-appearance . dark))
+       ;;(add-to-list 'default-frame-alist'(alpha . (80 . 75)))
        (menu-bar-mode -1)
        (scroll-bar-mode -1)
        (global-linum-mode 1)
@@ -68,6 +68,7 @@
      ;;(display-time-mode 1)
      ;; 指定模式禁用行号
      (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'term-mode-hook 'my-inhibit-global-linum-mode)
      (add-hook 'eshell-mode-hook 'my-inhibit-global-linum-mode)
      (add-hook 'telega-root-mode-hook 'my-inhibit-global-linum-mode)
      (add-hook 'telega-chat-mode-hook 'my-inhibit-global-linum-mode)
@@ -149,23 +150,23 @@
      (straight-use-package 'circadian)
 
      (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
+     (load-theme 'lazycat-light t)
+     ;; (use-package
+     ;;   circadian
+     ;;   :config
+     ;;   ;; 经纬度，可以在https://www.latlong.net/获取，默认是广州的
+     ;;   (setq calendar-latitude 35.388779
+     ;; 	calendar-longitude 116.084290)
+     ;;   ;; sunrise 白天用的主题 sunset 晚上用的主题
+     ;;   (setq circadian-themes '((:sunrise . lazycat-light)
+     ;; 			   (:sunset . lazycat-light)))
+     ;;   (circadian-setup))
 
-     (use-package
-       circadian
-       :config
-       ;; 经纬度，可以在https://www.latlong.net/获取，默认是广州的
-       (setq calendar-latitude 35.388779
-	     calendar-longitude 116.084290)
-       ;; sunrise 白天用的主题 sunset 晚上用的主题
-       (setq circadian-themes '((:sunrise . nasy)
-				(:sunset . nasy)))
-       (circadian-setup))
-
-     ;;(use-package awesome-tray
-     ;;  :load-path "~/.emacs.d/site-lisp/awesome-tray"
-     ;;  :init
-     ;;  (require 'awesome-tray)
-     ;;  (awesome-tray-mode 1))
+     (use-package awesome-tray
+       :load-path "~/.emacs.d/site-lisp/awesome-tray"
+       :init
+       (require 'awesome-tray)
+       (awesome-tray-mode 1))
 
 
 
@@ -285,7 +286,6 @@
        (setq lsp-prefer-capf t))
 
      (use-package lsp-ui :commands lsp-ui-mode)
-
    #+end_src
 ** Ivy
    #+begin_src emacs-lisp
@@ -416,4 +416,53 @@
      (straight-use-package 'go-mode)
      (use-package rust-mode
        :hook (go-mode . lsp))
-   #+end_src
+   #+end_src			      
+* Shell
+  #+begin_src emacs-lisp
+    (defun my/buffer-auto-close ()
+      "Close buffer after exit."
+      (when (ignore-errors (get-buffer-process (current-buffer)))
+	(set-process-sentinel (get-buffer-process (current-buffer))
+			      (lambda (process _exit-msg)
+				(when (memq (process-status process) '(exit stop))
+				  (kill-buffer (process-buffer process))
+				  (when (> (count-windows) 1)
+				    (delete-window)))))))
+    (defun term-mode-common-init ()
+      "The common initialization for term."
+      (setq-local scroll-margin 0)
+      (setq-local truncate-lines t)
+      (setq-local global-hl-line-mode nil)
+      (when (bound-and-true-p evil-mode)
+	(setq-local evil-insert-state-cursor 'box)
+	(evil-insert-state)))
+
+    ;; General term mode
+    ;;
+    ;; If you use bash, directory track is supported natively.
+    ;; See https://www.emacswiki.org/emacs/AnsiTermHints for more information.
+    (use-package term
+      :ensure nil
+      :hook (term-mode . (lambda ()
+			   (term-mode-common-init)
+			   (my/buffer-auto-close)
+			   (when-let* ((proc (ignore-errors (get-buffer-process (current-buffer)))))
+			     ;; Don't prompt about processes when killing term
+			     (set-process-query-on-exit-flag proc nil))))
+      :bind (:map term-raw-map
+		  ("C-c C-y" . term-paste)
+		  ;; Don't capture my keys!
+		  ("M-o" . nil)
+		  ("M-:" . nil)
+		  ("M-x" . nil)
+		  ("C-h" . nil)
+		  ("C-u" . nil))
+      :config
+      (when (eq system-type 'darwin)
+	(define-key term-raw-map (kbd "H-v") 'term-paste))
+      :custom
+      (term-input-ignoredups t)
+      (term-completion-autolist t)
+      (term-scroll-to-bottom-on-output 'all)
+      (term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
+  #+end_src
