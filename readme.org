@@ -48,9 +48,9 @@
    #+begin_src emacs-lisp
      (when (graphic-p)
      ;;  transparent frame
-       ;;(add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
-       ;;(add-to-list 'default-frame-alist'(ns-appearance . dark))
-       ;;(add-to-list 'default-frame-alist'(alpha . (80 . 75)))
+       (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
+       (add-to-list 'default-frame-alist'(ns-appearance . dark))
+       (add-to-list 'default-frame-alist'(alpha . (85 . 80)))
        (menu-bar-mode -1)
        (scroll-bar-mode -1)
        (global-linum-mode 1)
@@ -379,29 +379,17 @@
        :init
        (add-hook 'prog-mode-hook #'yas-minor-mode))
    #+end_src
-** Xah_Fly_Keys
+** Emacs-Rime
    #+begin_src emacs-lisp
-     (straight-use-package 'xah-fly-keys)
-     (use-package xah-fly-keys
-       :config
-       (xah-fly-keys-set-layout 'qwerty)
-       (xah-fly-keys 1))
-     (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-     (define-key xah-fly-w-keymap (kbd "o") 'xah-html-open-in-chrome-browser)
-     (define-key xah-fly-w-keymap (kbd "1") 'delete-other-windows)
-     (define-key xah-fly-w-keymap (kbd "t") 'treemacs)
-     (define-key xah-fly-leader-key-map (kbd "p") 'projectile-command-map)
-     (define-key xah-fly-leader-key-map (kbd "f") 'counsel-find-file)
-     (straight-use-package 'xah-fly-keys)
-     (use-package xah-fly-keys
-       :config
-       (xah-fly-keys-set-layout 'qwerty)
-       (xah-fly-keys 1))
-     (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
-     (define-key xah-fly-w-keymap (kbd "1") 'delete-other-windows)
-     (define-key xah-fly-w-keymap (kbd "t") 'treemacs)
-     (define-key xah-fly-leader-key-map (kbd "p") 'projectile-command-map)
-     (define-key xah-fly-leader-key-map (kbd "s") 'save-buffer)
+     (use-package rime
+       :straight (rime :type git
+		       :host github
+		       :repo "DogLooksGood/emacs-rime"
+		       :files ("*.el" "Makefile" "lib.c"))
+       :custom
+       (rime-emacs-module-header-root "~/Downloads")
+       (rime-show-candidate 'posframe)
+       (default-input-method "rime"))
    #+end_src
 * Languages
 ** Rust
