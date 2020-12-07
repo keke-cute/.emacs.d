@@ -116,6 +116,9 @@
        (dashboard-setup-startup-hook)
        (setq dashboard-startup-banner "~/.emacs.d/mega.png")
        (setq dashboard-banner-logo-title "Emacs ♥ Keke"))
+
+     (when *is-a-mac*
+       (tool-bar-mode t))
    #+end_src
 ** Font
    #+begin_src emacs-lisp
@@ -142,7 +145,7 @@
    #+end_src
 ** Theme & Modeline
    #+begin_src emacs-lisp
-     ;; theme
+      ;; theme
      (use-package lazycat-theme
        :load-path "~/.emacs.d/site-lisp/lazycat-theme")
      (straight-use-package 'modus-operandi-theme)
@@ -150,7 +153,7 @@
      (straight-use-package 'circadian)
 
      (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
-     (load-theme 'lazycat-light t)
+     (load-theme 'nasy t)
      ;; (use-package
      ;;   circadian
      ;;   :config
@@ -162,11 +165,11 @@
      ;; 			   (:sunset . lazycat-light)))
      ;;   (circadian-setup))
 
-     (use-package awesome-tray
-       :load-path "~/.emacs.d/site-lisp/awesome-tray"
-       :init
-       (require 'awesome-tray)
-       (awesome-tray-mode 1))
+     ;; (use-package awesome-tray
+     ;;   :load-path "~/.emacs.d/site-lisp/awesome-tray"
+     ;;   :init
+     ;;   (require 'awesome-tray)
+     ;;   (awesome-tray-mode 1))
 
 
 

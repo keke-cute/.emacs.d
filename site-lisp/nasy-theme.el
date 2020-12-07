@@ -24,12 +24,12 @@
   :group 'nasy-theme
   :type 'boolean)
 
-(defcustom nasy-theme-fixed-pitch-font "OperatorMonoSSmLig Nerd Font"
+(defcustom nasy-theme-fixed-pitch-font "OperatorMono Nerd Font"
   "Nasy them fixed pitch font."
   :group 'nasy-theme
   :type 'string)
 
-(defcustom nasy-theme-variable-pitch-font "Rec Mono Nasy"
+(defcustom nasy-theme-variable-pitch-font "Rec Mono Duotone"
   "Nasy them variable patch font."
   :group 'nasy-theme
   :type 'string)
