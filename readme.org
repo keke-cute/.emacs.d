@@ -512,6 +512,10 @@
      (use-package rust-mode
        :hook (go-mode . lsp))
    #+end_src			      
+** Haskell
+   #+begin_src emacs-lisp
+     (straight-use-package 'haskell-mode)
+   #+end_src
 * Shell
   #+begin_src emacs-lisp
     (defun my/buffer-auto-close ()
