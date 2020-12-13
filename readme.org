@@ -40,8 +40,8 @@
       (display-graphic-p))
 
     (if (string= (system-name) "playground") ;; if
-	(load-file "~/.emacs.d/etc/init-guix.el")) ;; then
-    ;;  (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
+	(load-file "~/.emacs.d/etc/init-guix.el") ;; then
+      (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
   #+end_src
 * UI
 ** Main UI
@@ -381,18 +381,6 @@
        (yas-reload-all)
        :init
        (add-hook 'prog-mode-hook #'yas-minor-mode))
-   #+end_src
-** Emacs-Rime
-   #+begin_src emacs-lisp
-     (use-package rime
-       :straight (rime :type git
-		       :host github
-		       :repo "DogLooksGood/emacs-rime"
-		       :files ("*.el" "Makefile" "lib.c"))
-       :custom
-       (rime-emacs-module-header-root "~/Downloads")
-       (rime-show-candidate 'posframe)
-       (default-input-method "rime"))
    #+end_src
 ** Xah-run-current-file
    #+begin_src emacs-lisp
