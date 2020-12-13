@@ -2,7 +2,7 @@
 ;;(require 'exwm-config)
 ;;(exwm-config-default)
 ;;
-;;(add-to-list 'load-path "~/.guix-profile/share/emacs/site-lisp")
+(add-to-list 'load-path "/run/current-system/profile/share/emacs/site-lisp/")
 ;;
 ;;(global-set-key (kbd "s-a") 'vterm)
 ;;

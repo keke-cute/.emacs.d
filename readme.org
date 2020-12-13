@@ -39,9 +39,9 @@
     (defun graphic-p ()
       (display-graphic-p))
 
-    ;; (if (string= (system-name) "KeaiGuix") ;; if
-    ;;     (load-file "~/.emacs.d/etc/init-guix.el") ;; then
-    ;;   (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
+    (if (string= (system-name) "playground") ;; if
+	(load-file "~/.emacs.d/etc/init-guix.el")) ;; then
+    ;;  (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
   #+end_src
 * UI
 ** Main UI
@@ -65,7 +65,7 @@
        ;;	      (height . 56)
        ;;	      )))
        )
-     ;;(display-time-mode 1)
+     (display-time-mode 1)
      ;; 指定模式禁用行号
      (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
      (add-hook 'term-mode-hook 'my-inhibit-global-linum-mode)
