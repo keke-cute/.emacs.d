@@ -503,6 +503,11 @@
 ** Haskell
    #+begin_src emacs-lisp
      (straight-use-package 'haskell-mode)
+     (custom-set-variables
+      '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
+      '(org-confirm-babel-evaluate nil))
+     (require 'haskell-mode)
+     (require 'inf-haskell)
    #+end_src
 * Shell
   #+begin_src emacs-lisp
