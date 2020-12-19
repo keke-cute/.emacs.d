@@ -136,12 +136,12 @@
 	   (setq buffer-face-mode-face 'width-font-face)
 	   (buffer-face-mode))
 	 (add-hook 'org-mode-hook 'org-buffer-face-mode-variable)))
-
+     (when (graphic-p)
      (if (version< "27.0" emacs-version)
 	 (set-fontset-font
 	  "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
        (set-fontset-font
-	t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+	t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)))
    #+end_src
 ** Theme & Modeline
    #+begin_src emacs-lisp
