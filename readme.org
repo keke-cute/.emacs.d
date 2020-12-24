@@ -151,9 +151,9 @@
      (straight-use-package 'modus-operandi-theme)
      (straight-use-package 'modus-vivendi-theme)
      (straight-use-package 'circadian)
-
-     (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
-     (load-theme 'nasy t)
+     (when (graphic-p)
+       (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
+       (load-theme 'nasy t))
      ;; (use-package
      ;;   circadian
      ;;   :config
