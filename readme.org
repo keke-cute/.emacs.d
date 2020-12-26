@@ -13,6 +13,85 @@
 	  (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
   #+end_src
+  
+  #+begin_src emacs-lisp
+    (straight-use-package 'leaf)
+    (straight-use-package 'magit)
+  #+end_src
+* Detect System
+  #+begin_src emacs-lisp
+    (defconst *is-a-mac* (eq system-type 'darwin))
+    (defconst *is-a-linux* (eq system-type 'gnu/linux))
+    (defun graphic-p ()
+      (display-graphic-p))
+
+    (if (string= (system-name) "playground") ;; if
+	(load-file "~/.emacs.d/etc/init-guix.el") ;; then
+      (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
+  #+end_src
+* UI
+** Main
+   #+begin_src emacs-lisp
+     (menu-bar-mode -1)
+     (scroll-bar-mode -1)
+     (global-linum-mode 1)
+     (tool-bar-mode -1)
+     (global-hl-line-mode t)
+     (setq inhibit-splash-screen t)
+
+     (when (graphic-p)
+       ;;  transparent frame
+       (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
+       (add-to-list 'default-frame-alist'(ns-appearance . dark))
+       (add-to-list 'default-frame-alist'(alpha . (90 . 85)))
+       (setq org-startup-with-inline-images t)
+       ;; default frame size
+       ;;      (setq initial-frame-alist
+       ;;	    '(
+       ;;	      (width . 106)
+       ;;	      (height . 56)
+       ;;	      )))
+       )
+     ;; 指定模式禁用行号
+     (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'term-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'eshell-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'telega-root-mode-hook 'my-inhibit-global-linum-mode)
+     (add-hook 'telega-chat-mode-hook 'my-inhibit-global-linum-mode)
+     (defun my-inhibit-global-linum-mode ()
+       "Counter-act `global-linum-mode'."
+       (add-hook 'after-change-major-mode-hook
+		 (lambda () (linum-mode 0))
+		 :append :local))
+     (when *is-a-mac*
+       (tool-bar-mode t))
+   #+end_src
+** Theme
+   #+begin_src emacs-lisp
+     (when (graphic-p)
+       (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
+       (load-theme 'nasy t))
+   #+end_src
+** Plugin
+*** 彩虹括号
+    #+begin_src emacs-lisp
+      (straight-use-package 'rainbow-delimiters)
+
+      (leaf rainbow-delimiters
+	:config
+	(add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+    #+end_src
+*** 对齐线
+    #+begin_src emacs-lisp
+      (straight-use-package 'highlight-indent-guides)
+
+      (leaf highlight-indent-guides
+	:hook
+	(prog-mode-hook .  highlight-indent-guides-mode)
+	:config
+	(setq highlight-indent-guides-method (if window-system 'character 'nil))
+	(setq highlight-indent-guides-responsive 'stack))
+    #+end_src
 * Editor
   #+begin_src emacs-lisp
     ;; 自动加载外部修改过的文件
@@ -32,3 +111,24 @@
     ;; y-or-n
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
+* Package
+** Selectrum
+   #+begin_src emacs-lisp
+     (straight-use-package 'selectrum)
+
+     (leaf selectrum
+       :config
+       (selectrum-mode +1))
+   #+end_src
+** Company
+   #+begin_src emacs-lisp
+     (straight-use-package 'company)
+
+     (leaf company
+       :hook
+       (after-init-hook . global-company-mode)
+       :init
+       (setq company-tooltip-align-annotations t company-idle-delay 0.1 company-echo-delay 0
+	     company-minimum-prefix-length 2 company-require-match nil company-dabbrev-ignore-case
+	     nil company-dabbrev-downcase nil company-show-numbers t))
+   #+end_src
