@@ -193,17 +193,22 @@
        :init
        (global-flycheck-mode))
    #+end_src
+** Org-babel
+   #+begin_src emacs-lisp
+     (custom-set-variables
+      '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
+      '(org-confirm-babel-evaluate nil))
+   #+end_src
 * Languages
 ** Haskell
    #+begin_src emacs-lisp
      (straight-use-package 'haskell-mode)
 
      (leaf haskell-mode
-       :require t
-       :custom
-       (custom-set-variables
-	'(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
-	'(org-confirm-babel-evaluate nil)))
+       :require t)
+
+     (leaf inf-haskell
+       :require t)
    #+end_src
 ** Golang
    #+begin_src emacs-lisp
