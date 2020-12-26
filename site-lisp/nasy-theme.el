@@ -29,7 +29,7 @@
   :group 'nasy-theme
   :type 'string)
 
-(defcustom nasy-theme-variable-pitch-font "Rec Mono Duotone"
+(defcustom nasy-theme-variable-pitch-font "OperatorMono Nerd Font"
   "Nasy them variable patch font."
   :group 'nasy-theme
   :type 'string)
@@ -219,6 +219,10 @@
      ((,class (:foreground ,n-靛青
                            :slant normal
                            :weight bold))))
+
+   ;; dashboard
+   `(widget-button
+     ((,class (:weight unspecified))))
 
    ;; display-fill-column-indicator-mode
    `(fill-column-indicator ((,class (:background ,n-湖蓝 :foreground ,n-靛青))))
