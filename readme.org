@@ -1,3 +1,10 @@
+#+title: My Emacs Configure
+#+author: keke
+#+email: liushike1997@gmail.com
+#+date: <2020-12-26 Sat>
+#+export_file_name: ~/Repos/keke-cute.github.io/blog/myemacsconf.html
+#+options: creator:t author:t
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" />
 * Straight.el
   #+begin_src emacs-lisp
     (defvar bootstrap-version)
@@ -52,19 +59,32 @@
        ;;	      (height . 56)
        ;;	      )))
        )
+
      ;; 指定模式禁用行号
-     (add-hook 'vterm-mode-hook 'my-inhibit-global-linum-mode)
-     (add-hook 'term-mode-hook 'my-inhibit-global-linum-mode)
-     (add-hook 'eshell-mode-hook 'my-inhibit-global-linum-mode)
-     (add-hook 'telega-root-mode-hook 'my-inhibit-global-linum-mode)
-     (add-hook 'telega-chat-mode-hook 'my-inhibit-global-linum-mode)
      (defun my-inhibit-global-linum-mode ()
        "Counter-act `global-linum-mode'."
        (add-hook 'after-change-major-mode-hook
 		 (lambda () (linum-mode 0))
 		 :append :local))
+
+     (leaf my-inhibit-global-linum-mode
+       :hook
+       (eshell-mode-hook . my-inhibit-global-linum-mode)
+       (term-mode-hook . my-inhibit-global-linum-mode)
+       (vterm-mode-hook . my-inhibit-global-linum-mode)
+       (telega-chat-mode-hook . my-inhibit-global-linum-mode)
+       (telega-root-mode-hook . my-inhibit-global-linum-mode))
+
      (when *is-a-mac*
        (tool-bar-mode t))
+   #+end_src
+** Font
+   #+begin_src emacs-lisp
+     (when (graphic-p)
+       (let ((emacs-font-size 13)
+	     (emacs-font-name "OperatorMono Nerd Font"))
+	 (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
+	 (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))))
    #+end_src
 ** Theme
    #+begin_src emacs-lisp
@@ -72,14 +92,34 @@
        (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
        (load-theme 'nasy t))
    #+end_src
-** Plugin
+** Plugins
 *** 彩虹括号
     #+begin_src emacs-lisp
       (straight-use-package 'rainbow-delimiters)
 
       (leaf rainbow-delimiters
+	:hook
+	(prog-mode-hook . rainbow-delimiters-mode)
 	:config
-	(add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+	;; 设置每一级括号的颜色
+	(set-face-foreground 'rainbow-delimiters-depth-1-face "orange red") 
+	(set-face-foreground 'rainbow-delimiters-depth-2-face "gold") 
+	(set-face-foreground 'rainbow-delimiters-depth-3-face "yellow") 
+	(set-face-foreground 'rainbow-delimiters-depth-4-face "spring green") 
+	(set-face-foreground 'rainbow-delimiters-depth-5-face "cyan") 
+	(set-face-foreground 'rainbow-delimiters-depth-6-face "magenta") 
+	(set-face-foreground 'rainbow-delimiters-depth-7-face "goldenrod") 
+	(set-face-foreground 'rainbow-delimiters-depth-8-face "IndianRed1") 
+	(set-face-foreground 'rainbow-delimiters-depth-9-face "ivory1") 
+	(set-face-bold 'rainbow-delimiters-depth-1-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-2-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-3-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-4-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-5-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-6-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-7-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-8-face "t") 
+	(set-face-bold 'rainbow-delimiters-depth-9-face "t"))
     #+end_src
 *** 对齐线
     #+begin_src emacs-lisp
@@ -111,7 +151,7 @@
     ;; y-or-n
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
-* Package
+* Packages
 ** Selectrum
    #+begin_src emacs-lisp
      (straight-use-package 'selectrum)
@@ -130,5 +170,46 @@
        :init
        (setq company-tooltip-align-annotations t company-idle-delay 0.1 company-echo-delay 0
 	     company-minimum-prefix-length 2 company-require-match nil company-dabbrev-ignore-case
-	     nil company-dabbrev-downcase nil company-show-numbers t))
+	     nil company-dabbrev-downcase nil company-show-numbers t)
+       :bind
+       ((:company-active-map
+	 ("M-n" . nil) 
+	 ("M-p" . nil) 
+	 ("C-n" . company-select-next) 
+	 ("C-p" . company-select-previous))))
+   #+end_src
+** Lsp-mode
+   #+begin_src emacs-lisp
+     (straight-use-package 'lsp-mode)
+
+     (leaf lsp-mode
+       :commands lsp)
+   #+end_src
+** Flycheck
+   #+begin_src emacs-lisp
+     (straight-use-package 'flycheck)
+
+     (leaf flycheck
+       :init
+       (global-flycheck-mode))
+   #+end_src
+* Languages
+** Haskell
+   #+begin_src emacs-lisp
+     (straight-use-package 'haskell-mode)
+
+     (leaf haskell-mode
+       :require t
+       :custom
+       (custom-set-variables
+	'(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
+	'(org-confirm-babel-evaluate nil)))
+   #+end_src
+** Golang
+   #+begin_src emacs-lisp
+     (straight-use-package 'go-mode)
+
+     (leaf go-mode
+       :hook
+       (go-mode-hook . lsp))
    #+end_src
