@@ -123,14 +123,15 @@
     #+end_src
 *** 对齐线
     #+begin_src emacs-lisp
-      (straight-use-package 'highlight-indent-guides)
+      (when (graphic-p)
+	(straight-use-package 'highlight-indent-guides)
 
-      (leaf highlight-indent-guides
-	:hook
-	(prog-mode-hook .  highlight-indent-guides-mode)
-	:config
-	(setq highlight-indent-guides-method (if window-system 'character 'nil))
-	(setq highlight-indent-guides-responsive 'stack))
+	(leaf highlight-indent-guides
+	  :hook
+	  (prog-mode-hook .  highlight-indent-guides-mode)
+	  :config
+	  (setq highlight-indent-guides-method (if window-system 'character 'nil))
+	  (setq highlight-indent-guides-responsive 'stack)))
     #+end_src
 * Editor
   #+begin_src emacs-lisp
