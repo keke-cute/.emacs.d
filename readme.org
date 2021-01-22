@@ -29,12 +29,18 @@
   #+begin_src emacs-lisp
     (defconst *is-a-mac* (eq system-type 'darwin))
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
+
     (defun graphic-p ()
       (display-graphic-p))
 
-    (if (string= (system-name) "playground") ;; if
-	(load-file "~/.emacs.d/etc/init-guix.el") ;; then
-      (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
+
+    (when (file-directory-p "/run/current-system/profile/share/emacs/site-lisp")
+      (add-to-list 'load-path "/run/current-system/profile/share/emacs/site-lisp/")
+      (message "Hello, Guix System User"))
+
+    ;;(if (string= (system-name) "playground") ;; if
+    ;;    (load-file "~/.emacs.d/etc/init-guix.el") ;; then
+    ;;  (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
   #+end_src
 * UI
 ** Main
