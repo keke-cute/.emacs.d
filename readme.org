@@ -36,7 +36,14 @@
 
     (when (file-directory-p "/run/current-system/profile/share/emacs/site-lisp")
       (add-to-list 'load-path "/run/current-system/profile/share/emacs/site-lisp/")
-      (message "Hello, Guix System User"))
+      (message "Hello, Guix System User")
+      (leaf exwm-systemtray
+	:commands
+	exwm-systemtray--init
+	exwm-systemtray--enable
+	:hook
+	(exwm-init-hook . exwm-systemtray--init)
+	(exwm-exit-hook . exwm-systemtray--exit)))
 
     ;;(if (string= (system-name) "playground") ;; if
     ;;    (load-file "~/.emacs.d/etc/init-guix.el") ;; then
