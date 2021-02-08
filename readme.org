@@ -89,7 +89,7 @@
        (telega-root-mode-hook . my-inhibit-global-linum-mode))
 
      (when *is-a-mac*
-       (tool-bar-mode t))
+       (tool-bar-mode -1))
    #+end_src
 ** Font
    #+begin_src emacs-lisp
@@ -231,4 +231,9 @@
      (leaf go-mode
        :hook
        (go-mode-hook . lsp))
+   #+end_src
+
+** Nix
+   #+begin_src emacs-lisp
+     (straight-use-package 'nix-mode)
    #+end_src
