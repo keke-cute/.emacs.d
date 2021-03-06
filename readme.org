@@ -102,8 +102,8 @@
 ** Theme
    #+begin_src emacs-lisp
      (when (graphic-p)
-       (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
-       (load-theme 'nasy t))
+       (load-file "~/.emacs.d/site-lisp/storybook-theme.el")
+       (load-theme 'storybook t))
    #+end_src
 ** Plugins
 *** 彩虹括号
