@@ -213,6 +213,10 @@
       '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
       '(org-confirm-babel-evaluate nil))
    #+end_src
+** Telega
+   #+begin_src emacs-lisp
+     (straight-use-package 'telega)
+   #+end_src
 * Languages
 ** Haskell
    #+begin_src emacs-lisp
