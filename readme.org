@@ -96,7 +96,7 @@
    #+begin_src emacs-lisp
      (when (graphic-p)
        (let ((emacs-font-size 16)
-	     (emacs-font-name "OperatorMono Nerd Font"))
+	     (emacs-font-name "OperatorMonoSSmLig Nerd Font"))
 	 (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
 	 (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))))
    #+end_src
