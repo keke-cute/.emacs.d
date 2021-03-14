@@ -90,7 +90,7 @@
        (telega-root-mode-hook . my-inhibit-global-linum-mode))
 
      (when *is-a-mac*
-       (tool-bar-mode -1))
+       (tool-bar-mode 1))
    #+end_src
 ** Font
    #+begin_src emacs-lisp
@@ -103,8 +103,12 @@
 ** Theme
    #+begin_src emacs-lisp
      (when (graphic-p)
-       (load-file "~/.emacs.d/site-lisp/storybook-theme.el")
-       (load-theme 'storybook t))
+       (when *is-a-linux*
+	 (load-file "~/.emacs.d/site-lisp/storybook-theme.el")
+	 (load-theme 'storybook t))
+       (when *is-a-mac*
+	 (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
+	 (load-theme 'nasy t)))
    #+end_src
 ** Plugins
 *** 彩虹括号
