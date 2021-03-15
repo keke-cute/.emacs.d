@@ -29,7 +29,7 @@
   :group 'nasy-theme
   :type 'string)
 
-(defcustom nasy-theme-variable-pitch-font "OperatorMonoSSmLig Nerd Font"
+(defcustom nasy-theme-variable-pitch-font "Recursive Mono Casual Static"
   "Nasy them variable patch font."
   :group 'nasy-theme
   :type 'string)
