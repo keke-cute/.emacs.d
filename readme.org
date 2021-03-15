@@ -94,22 +94,17 @@
    #+end_src
 ** Font
    #+begin_src emacs-lisp
-     (when (display-graphic-p)
-       (set-face-attribute
-	'default nil
-	:font (font-spec :name   "OperatorMonoSSmLig Nerd Font"
-			 :weight 'normal
-			 :size   15)))
+     (when (graphic-p)
+       (let ((emacs-font-size 13)
+	     (emacs-font-name "BlexMono Nerd Font"))
+	 (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
+	 (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))))
    #+end_src
 ** Theme
    #+begin_src emacs-lisp
      (when (graphic-p)
-       (when *is-a-linux*
-	 (load-file "~/.emacs.d/site-lisp/storybook-theme.el")
-	 (load-theme 'storybook t))
-       (when *is-a-mac*
-	 (load-file "~/.emacs.d/site-lisp/nasy-theme.el")
-	 (load-theme 'nasy t)))
+       (load-file "~/.emacs.d/site-lisp/printed-theme.el")
+       (load-theme 'printed t))
    #+end_src
 ** Plugins
 *** 彩虹括号
@@ -215,7 +210,7 @@
    #+end_src
 ** Org-babel
    #+begin_src emacs-lisp
-     (custom-set-variables
+   (custom-set-variables
       '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
       '(org-confirm-babel-evaluate nil))
    #+end_src
@@ -286,9 +281,4 @@
      (leaf go-mode
        :hook
        (go-mode-hook . lsp))
-   #+end_src
-
-** Nix
-   #+begin_src emacs-lisp
-     (straight-use-package 'nix-mode)
    #+end_src
