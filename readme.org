@@ -1,10 +1,10 @@
 #+title: My Emacs Configure
 #+author: keke
 #+email: liushike1997@gmail.com
-#+date: <2020-12-26 Sat>
-#+export_file_name: ~/Repos/keke-cute.github.io/blog/myemacsconf.html
+#+date: <2021-03-16 Tue>
+#+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
 * Straight.el
   #+begin_src emacs-lisp
     (defvar bootstrap-version)
@@ -246,7 +246,7 @@
      ;;   This particular HTML creates a <div> with a simple linked headline
      (setq org-static-blog-page-preamble
      "<div class=\"header\">
-       <a href=\"https://keke-cute.github.io\">Ethereal Horizon</a>
+       <a href=\"https://keke-cute.github.io\">Ethereal Horizon</a> <A href=\"https://keke-cute.github.io/emacs.html\">Emacs Configure</a>
      </div>")
 
      ;; This postamble is inserted at the end of the <body> of every page:
