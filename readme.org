@@ -90,7 +90,7 @@
        (telega-root-mode-hook . my-inhibit-global-linum-mode))
 
      (when *is-a-mac*
-       (tool-bar-mode 1))
+	 (tool-bar-mode 1))
    #+end_src
 ** Font
    #+begin_src emacs-lisp
