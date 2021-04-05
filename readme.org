@@ -54,13 +54,14 @@
 ** Main
    #+begin_src emacs-lisp
      (menu-bar-mode -1)
+
      (global-linum-mode 1)
      (setq inhibit-splash-screen t)
 
      (when (graphic-p)
        ;;  transparent frame
        (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
-       (add-to-list 'default-frame-alist'(ns-appearance . dark))
+       (add-to-list 'default-frame-alist'(ns-appearance . light))
        (add-to-list 'default-frame-alist'(alpha . (90 . 85)))
        (setq org-startup-with-inline-images t)
        (global-hl-line-mode t)
@@ -90,21 +91,43 @@
        (telega-root-mode-hook . my-inhibit-global-linum-mode))
 
      (when *is-a-mac*
-	 (tool-bar-mode 1))
+       (tool-bar-mode 1)
+       (menu-bar-mode 1))
    #+end_src
 ** Font
    #+begin_src emacs-lisp
-     (when (graphic-p)
-       (let ((emacs-font-size 13)
-	     (emacs-font-name "BlexMono Nerd Font"))
-	 (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)) nil t)
-	 (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name))))
+     ;; set default font
+     (cond
+      ((string-equal system-type "windows-nt") ; Microsoft Windows
+       (when (member "Consolas" (font-family-list))
+	 (set-frame-font "Consolas" t t)))
+      ((string-equal system-type "darwin") ; macOS
+       (when (member "Menlo" (font-family-list))
+	 (set-frame-font "Menlo" t t)))
+      ((string-equal system-type "gnu/linux") ; linux
+       (when (member "DejaVu Sans Mono" (font-family-list))
+	 (set-frame-font "DejaVu Sans Mono" t t))))
+
+     ;; set font for emoji
+     (set-fontset-font
+      t
+      '(#x1f300 . #x1fad0)
+      (cond
+       ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
+       ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
+       ((member "Segoe UI Emoji" (font-family-list)) "Segoe UI Emoji")
+       ((member "Symbola" (font-family-list)) "Symbola")
+       ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji"))
+      ;; Apple Color Emoji should be before Symbola, but Richard Stallman disabled it.
+      ;; GNU Emacs Removes Color Emoji Support on the Mac
+      ;; http://ergoemacs.org/misc/emacs_macos_emoji.html
+      ;;
+      )
    #+end_src
 ** Theme
    #+begin_src emacs-lisp
      (when (graphic-p)
-       (load-file "~/.emacs.d/site-lisp/printed-theme.el")
-       (load-theme 'printed t))
+       (load-theme 'nasy t))
    #+end_src
 ** Plugins
 *** 彩虹括号
@@ -217,6 +240,11 @@
 ** Telega
    #+begin_src emacs-lisp
      (straight-use-package 'telega)
+   #+end_src
+** Exec-path-from-shell
+   #+begin_src emacs-lisp
+     (straight-use-package 'exec-path-from-shell)
+     (exec-path-from-shell-initialize)
    #+end_src
 ** Org-static-blog
    #+begin_src emacs-lisp
