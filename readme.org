@@ -1,11 +1,11 @@
 #+title: My Emacs Configure
 #+author: keke
 #+email: liushike1997@gmail.com
-#+date: <2021-04-05 Mon>
+#+date: <2021-04-10 Sat>
 #+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
-* Straight.el
+* Main Package(Straight.el & Leaf)
   #+begin_src emacs-lisp
     (defvar bootstrap-version)
     (let ((bootstrap-file
@@ -23,6 +23,9 @@
   
   #+begin_src emacs-lisp
     (straight-use-package 'leaf)
+    (straight-use-package 'leaf-keywords)
+    (leaf-keywords-init)
+
     (straight-use-package 'magit)
     (straight-use-package 'htmlize)
   #+end_src
@@ -54,26 +57,22 @@
 ** Main
    #+begin_src emacs-lisp
      (menu-bar-mode -1)
-
      (global-linum-mode 1)
      (setq inhibit-splash-screen t)
 
      (when (graphic-p)
-       ;;  transparent frame
+       ;; transparent frame
        (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
        (add-to-list 'default-frame-alist'(ns-appearance . light))
-       (add-to-list 'default-frame-alist'(alpha . (90 . 85)))
+       (add-to-list 'default-frame-alist'(alpha . (90 . 85)))  
+       ;; default frame size
+       ;;(setq initial-frame-alist
+       ;;	'((width . 150)
+       ;;	  (height . 56)))
        (setq org-startup-with-inline-images t)
        (global-hl-line-mode t)
        (scroll-bar-mode -1)
-       (tool-bar-mode -1)
-       ;; default frame size
-       ;;      (setq initial-frame-alist
-       ;;	    '(
-       ;;	      (width . 106)
-       ;;	      (height . 56)
-       ;;	      )))
-       )
+       (tool-bar-mode -1))
 
      ;; 指定模式禁用行号
      (defun my-inhibit-global-linum-mode ()
@@ -103,7 +102,7 @@
 	 (set-frame-font "Consolas" t t)))
       ((string-equal system-type "darwin") ; macOS
        (when (member "Menlo" (font-family-list))
-	 (set-frame-font "Menlo" t t)))
+	 (set-frame-font "Menlo-14" t t)))
       ((string-equal system-type "gnu/linux") ; linux
        (when (member "DejaVu Sans Mono" (font-family-list))
 	 (set-frame-font "DejaVu Sans Mono" t t))))
@@ -139,24 +138,17 @@
 	(prog-mode-hook . rainbow-delimiters-mode)
 	:config
 	;; 设置每一级括号的颜色
-	(set-face-foreground 'rainbow-delimiters-depth-1-face "orange red") 
-	(set-face-foreground 'rainbow-delimiters-depth-2-face "gold") 
-	(set-face-foreground 'rainbow-delimiters-depth-3-face "yellow") 
-	(set-face-foreground 'rainbow-delimiters-depth-4-face "spring green") 
-	(set-face-foreground 'rainbow-delimiters-depth-5-face "cyan") 
-	(set-face-foreground 'rainbow-delimiters-depth-6-face "magenta") 
-	(set-face-foreground 'rainbow-delimiters-depth-7-face "goldenrod") 
-	(set-face-foreground 'rainbow-delimiters-depth-8-face "IndianRed1") 
-	(set-face-foreground 'rainbow-delimiters-depth-9-face "ivory1") 
-	(set-face-bold 'rainbow-delimiters-depth-1-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-2-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-3-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-4-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-5-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-6-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-7-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-8-face "t") 
-	(set-face-bold 'rainbow-delimiters-depth-9-face "t"))
+	(custom-set-faces
+	 '(rainbow-delimiters-base-face    ((t (:inherit nil :weight bold))))
+	 '(rainbow-delimiters-depth-1-face ((t (:inherit rainbow-delimiters-base-face :foreground "dark orange"))))
+	 '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "gold"))))
+	 '(rainbow-delimiters-depth-3-face ((t (:inherit rainbow-delimiters-base-face :foreground "YellowGreen"))))
+	 '(rainbow-delimiters-depth-4-face ((t (:inherit rainbow-delimiters-base-face :foreground "LimeGreen"))))
+	 '(rainbow-delimiters-depth-5-face ((t (:inherit rainbow-delimiters-base-face :foreground "dodger blue"))))
+	 '(rainbow-delimiters-depth-6-face ((t (:inherit rainbow-delimiters-base-face :foreground "MediumSlateBlue"))))
+	 '(rainbow-delimiters-depth-7-face ((t (:inherit rainbow-delimiters-base-face :foreground "blue violet"))))
+	 '(rainbow-delimiters-depth-8-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))
+	 '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))))
     #+end_src
 *** 对齐线
     #+begin_src emacs-lisp
@@ -206,13 +198,56 @@
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
 * Packages
-** Selectrum
+** Ivy
    #+begin_src emacs-lisp
-     (straight-use-package 'selectrum)
+     (straight-use-package 'ivy)
+     (straight-use-package 'swiper)
+     (straight-use-package 'counsel)
+     (straight-use-package 'ivy-posframe)
+     (straight-use-package 'all-the-icons-ivy-rich)
 
-     (leaf selectrum
+     (leaf ivy
+       :doc "Incremental Vertical completYon"
+       :req "emacs-24.5"
+       :tag "matching" "emacs>=24.5"
+       :url "https://github.com/abo-abo/swiper"
+       :emacs>= 24.5
+       :leaf-defer nil
+       :custom ((ivy-initial-inputs-alist . nil)
+		(ivy-use-selectable-prompt . t))
+       :global-minor-mode t
        :config
-       (selectrum-mode +1))
+       (leaf swiper
+	 :doc "Isearch with an overview. Oh, man!"
+	 :req "emacs-24.5" "ivy-0.13.0"
+	 :tag "matching" "emacs>=24.5"
+	 :url "https://github.com/abo-abo/swiper"
+	 :emacs>= 24.5
+	 :bind (("C-s" . swiper)))
+
+       (leaf counsel
+	 :doc "Various completion functions using Ivy"
+	 :req "emacs-24.5" "swiper-0.13.0"
+	 :tag "tools" "matching" "convenience" "emacs>=24.5"
+	 :url "https://github.com/abo-abo/swiper"
+	 :emacs>= 24.5
+	 :bind (("C-S-s" . counsel-imenu)
+		("C-x C-r" . counsel-recentf))
+	 :custom `((counsel-yank-pop-separator . "\n----------\n")
+		   (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
+	 :global-minor-mode t))
+
+     (leaf ivy-posframe
+       :hook (ivy-mode-hook)
+       :mode-hook
+       (setq ivy-auto-shrink-minibuffer-alist nil)
+       :global-minor-mode t)
+
+     (leaf all-the-icons-ivy-rich
+       :global-minor-mode t)
+
+     (leaf ivy-rich
+       :global-minor-mode t)
    #+end_src
 ** Company
    #+begin_src emacs-lisp
