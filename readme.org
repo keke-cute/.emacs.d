@@ -1,26 +1,26 @@
-#+title: My Emacs Configure
+#+title: 我的 Emacs 配置文件
 #+author: keke
-#+email: liushike1997@gmail.com
-#+date: <2021-04-10 Sat>
+#+email: librek@protonmail.com
+#+date: <2021-04-15 Thu>
 #+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
-* Main Package(Straight.el & Leaf)
+* 包管理器与配置包(Straight.el & Leaf)
   #+begin_src emacs-lisp
     (defvar bootstrap-version)
     (let ((bootstrap-file
-	   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-	  (bootstrap-version 5))
+           (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+          (bootstrap-version 5))
       (unless (file-exists-p bootstrap-file)
-	(with-current-buffer
-	    (url-retrieve-synchronously
-	     "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	     'silent 'inhibit-cookies)
-	  (goto-char (point-max))
-	  (eval-print-last-sexp)))
+        (with-current-buffer
+            (url-retrieve-synchronously
+             "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+             'silent 'inhibit-cookies)
+          (goto-char (point-max))
+          (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
   #+end_src
-  
+
   #+begin_src emacs-lisp
     (straight-use-package 'leaf)
     (straight-use-package 'leaf-keywords)
@@ -29,7 +29,22 @@
     (straight-use-package 'magit)
     (straight-use-package 'htmlize)
   #+end_src
-* Detect System
+
+* 宏和别名
+  Code from [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-libs.org]]
+  #+begin_src emacs-lisp
+    ;;;###autoload
+    (if (fboundp 'with-eval-after-load)
+        (defalias 'after-x 'with-eval-after-load)
+      (defmacro after-x (feature &rest body)
+        "Eval BODY afetr FEATURE have loaded."
+        (declare (indent defun))
+        `(eval-after-load ,feature
+           '(progn ,@body))))
+    (defalias 'gsetq-local #'general-setq-local)
+  #+end_src
+
+* 检测系统
   #+begin_src emacs-lisp
     (defconst *is-a-mac* (eq system-type 'darwin))
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
@@ -42,143 +57,302 @@
       (add-to-list 'load-path "/run/current-system/profile/share/emacs/site-lisp/")
       (message "Hello, Guix System User")
       (leaf exwm-systemtray
-	:commands
-	exwm-systemtray--init
-	exwm-systemtray--enable
-	:hook
-	(exwm-init-hook . exwm-systemtray--init)
-	(exwm-exit-hook . exwm-systemtray--exit)))
+        :commands
+        exwm-systemtray--init
+        exwm-systemtray--enable
+        :hook
+        (exwm-init-hook . exwm-systemtray--init)
+        (exwm-exit-hook . exwm-systemtray--exit)))
 
     ;;(if (string= (system-name) "playground") ;; if
     ;;    (load-file "~/.emacs.d/etc/init-guix.el") ;; then
     ;;  (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
   #+end_src
-* UI
-** Main
-   #+begin_src emacs-lisp
-     (menu-bar-mode -1)
-     (global-linum-mode 1)
-     (setq inhibit-splash-screen t)
 
+* 界面
+
+** 主要的一些设定
+   #+begin_src emacs-lisp
+     (setq inhibit-splash-screen t)
      (when (graphic-p)
-       ;; transparent frame
-       (add-to-list 'default-frame-alist'(ns-transparent-titlebar . t))
-       (add-to-list 'default-frame-alist'(ns-appearance . light))
-       (add-to-list 'default-frame-alist'(alpha . (90 . 85)))  
        ;; default frame size
        ;;(setq initial-frame-alist
        ;;	'((width . 150)
        ;;	  (height . 56)))
        (setq org-startup-with-inline-images t)
        (global-hl-line-mode t)
-       (scroll-bar-mode -1)
-       (tool-bar-mode -1))
-
-     ;; 指定模式禁用行号
-     (defun my-inhibit-global-linum-mode ()
-       "Counter-act `global-linum-mode'."
-       (add-hook 'after-change-major-mode-hook
-		 (lambda () (linum-mode 0))
-		 :append :local))
-
-     (leaf my-inhibit-global-linum-mode
-       :hook
-       (eshell-mode-hook . my-inhibit-global-linum-mode)
-       (term-mode-hook . my-inhibit-global-linum-mode)
-       (vterm-mode-hook . my-inhibit-global-linum-mode)
-       (telega-chat-mode-hook . my-inhibit-global-linum-mode)
-       (telega-root-mode-hook . my-inhibit-global-linum-mode))
-
-     (when *is-a-mac*
-       (tool-bar-mode 1)
-       (menu-bar-mode 1))
+       (scroll-bar-mode -1))
    #+end_src
-** Font
+
+** 指定模式禁用行号
    #+begin_src emacs-lisp
-     ;; set default font
-     (cond
-      ((string-equal system-type "windows-nt") ; Microsoft Windows
-       (when (member "Consolas" (font-family-list))
-	 (set-frame-font "Consolas" t t)))
-      ((string-equal system-type "darwin") ; macOS
-       (when (member "Menlo" (font-family-list))
-	 (set-frame-font "Menlo-14" t t)))
-      ((string-equal system-type "gnu/linux") ; linux
-       (when (member "DejaVu Sans Mono" (font-family-list))
-	 (set-frame-font "DejaVu Sans Mono" t t))))
+     ;; (defun my-inhibit-global-linum-mode ()
+     ;;   "Counter-act `global-linum-mode'."
+     ;;   (add-hook 'after-change-major-mode-hook
+     ;;             (lambda () (linum-mode 0))
+     ;;             :append :local))
+     ;; 
+     ;; (leaf my-inhibit-global-linum-mode
+     ;;   :hook
+     ;;   (eshell-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (term-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (vterm-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (telega-chat-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (telega-root-mode-hook . my-inhibit-global-linum-mode))
+     ;; 
+   #+end_src
 
-     ;; set font for emoji
-     (set-fontset-font
-      t
-      '(#x1f300 . #x1fad0)
-      (cond
-       ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
-       ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
-       ((member "Segoe UI Emoji" (font-family-list)) "Segoe UI Emoji")
-       ((member "Symbola" (font-family-list)) "Symbola")
-       ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji"))
-      ;; Apple Color Emoji should be before Symbola, but Richard Stallman disabled it.
-      ;; GNU Emacs Removes Color Emoji Support on the Mac
-      ;; http://ergoemacs.org/misc/emacs_macos_emoji.html
-      ;;
-      )
-   #+end_src
-** Theme
+** 字体设定
    #+begin_src emacs-lisp
-     (when (graphic-p)
-       (load-theme 'nasy t))
+     (leaf nasy-font
+       :doc "一些默訒値。"
+       :custom
+       ((*font-main-family*   . "OperatorMonoSSmLig Nerd Font")
+        (*font-symbol-family* . "Symbola")
+        (*font-cjk-family*    . "STFLGQKJF")
+        (*font-cjk-2-family*  . "FZLiuGongQuanKaiShuJF")
+        ;; I.Ngaan' font from `http://founder.acgvlyric.org/iu/doku.php/造字:開源字型_i.顏體'.
+        (*font-cjk-3-family*  . "I.Ngaan")
+        (*font-cjk-4-family*  . "Kaiti SC")
+        (*font-cjk-5-family*  . "Kaiti TC")
+        ((*font-mode-line-family*
+          ,*font-header-line-family*
+          ,*font-tab-line-family*)
+         . "Recursive Mono Casual Static"))
+
+       (((*font-main-size*
+          ,*font-mode-line-size*)
+         . 14)
+        (*font-symbol-size* . 17)
+        ((*font-cjk-size*
+          ,*font-cjk-2-size*
+          ,*font-cjk-3-size*
+          ,*font-cjk-4-size*
+          ,*font-cjk-5-size*)
+         . nil)
+        ((*font-tab-line-size*
+          ,*font-header-line-size*)
+         . 12))
+
+       ((*font-cjk-scale*
+          ,*font-cjk-2-scale*
+          ,*font-cjk-3-scale*
+          ,*font-cjk-4-scale*
+          ,*font-cjk-5-scale*)
+        . 1.3)
+
+       ((*font-main-weight*
+         ,*font-symbol-weight*
+         ,*font-cjk-weight*
+         ,*font-cjk-2-weight*
+         ,*font-cjk-3-weight*
+         ;; *font-cjk-4-weight*
+         ;; *font-cjk-5-weight*
+         ,*font-mode-line-weight*
+         ,*font-tab-line-weight*
+         ,*font-header-line-weight*)
+        . 'normal)
+
+       ((*font-cjk-4-weight*
+         ,*font-cjk-5-weight*) . 'bold))
    #+end_src
-** Plugins
+
+** 设定macOS上的窗口样式
+   #+begin_src emacs-lisp
+     (leaf mac-frame
+       :when *is-a-mac*
+       :config
+       (defun stop-minimizing-window ()
+         "Stop minimizing window under macOS."
+         (interactive)
+         (unless (and *is-a-mac*
+                     window-system)
+           (suspend-frame)))
+       :custom
+       (default-frame-alist
+         . '((ns-transparent-titlebar . t)
+             (ns-appearance           . light)
+             (alpha                   . (80 . 75))
+             (vertical-scroll-bars    . nil)
+             (internal-border-width   . 24))))
+   #+end_src
+
+** 主题设定
+   #+begin_src emacs-lisp
+     (load-theme 'nasy t)
+   #+end_src
+** 工具栏设定
+   #+begin_src emacs-lisp
+     (leaf tool-bar
+       :tag "builtin"
+       :bind
+       (:tool-bar-map
+	([copy]            . nil)
+	([cut]             . nil)
+	([dired]           . nil)
+	([isearch-forward] . nil)
+	([new-file]        . nil)
+	([open-file]       . nil)
+	([paste]           . nil)
+	([save-buffer]     . nil)
+	([undo]            . nil)
+	([yank]            . nil)))
+	;; ([dashboard-refresh-buffer]
+	;;  . `(menu-item))))
+   #+end_src
+
+** 一些关于界面的插件
+
 *** 彩虹括号
     #+begin_src emacs-lisp
       (straight-use-package 'rainbow-delimiters)
 
       (leaf rainbow-delimiters
-	:hook
-	(prog-mode-hook . rainbow-delimiters-mode)
-	:config
-	;; 设置每一级括号的颜色
-	(custom-set-faces
-	 '(rainbow-delimiters-base-face    ((t (:inherit nil :weight bold))))
-	 '(rainbow-delimiters-depth-1-face ((t (:inherit rainbow-delimiters-base-face :foreground "dark orange"))))
-	 '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "gold"))))
-	 '(rainbow-delimiters-depth-3-face ((t (:inherit rainbow-delimiters-base-face :foreground "YellowGreen"))))
-	 '(rainbow-delimiters-depth-4-face ((t (:inherit rainbow-delimiters-base-face :foreground "LimeGreen"))))
-	 '(rainbow-delimiters-depth-5-face ((t (:inherit rainbow-delimiters-base-face :foreground "dodger blue"))))
-	 '(rainbow-delimiters-depth-6-face ((t (:inherit rainbow-delimiters-base-face :foreground "MediumSlateBlue"))))
-	 '(rainbow-delimiters-depth-7-face ((t (:inherit rainbow-delimiters-base-face :foreground "blue violet"))))
-	 '(rainbow-delimiters-depth-8-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))
-	 '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))))
+        :hook
+        (prog-mode-hook . rainbow-delimiters-mode)
+        :config
+        ;; 设置每一级括号的颜色
+        (custom-set-faces
+         '(rainbow-delimiters-base-face    ((t (:inherit nil :weight bold))))
+         '(rainbow-delimiters-depth-1-face ((t (:inherit rainbow-delimiters-base-face :foreground "dark orange"))))
+         '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "gold"))))
+         '(rainbow-delimiters-depth-3-face ((t (:inherit rainbow-delimiters-base-face :foreground "YellowGreen"))))
+         '(rainbow-delimiters-depth-4-face ((t (:inherit rainbow-delimiters-base-face :foreground "LimeGreen"))))
+         '(rainbow-delimiters-depth-5-face ((t (:inherit rainbow-delimiters-base-face :foreground "dodger blue"))))
+         '(rainbow-delimiters-depth-6-face ((t (:inherit rainbow-delimiters-base-face :foreground "MediumSlateBlue"))))
+         '(rainbow-delimiters-depth-7-face ((t (:inherit rainbow-delimiters-base-face :foreground "blue violet"))))
+         '(rainbow-delimiters-depth-8-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))
+         '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))))
     #+end_src
+
+*** 彩虹猫
+    #+begin_src emacs-lisp
+      (straight-use-package 'nyan-mode)
+      (leaf nyan-mode
+	:custom (nyan-animate-nyancat . t)
+		(nyan-bar-length      . 16)
+		(nyan-wavy-trail      . t)
+	:hook after-init-hook)
+
+    #+end_src
+
 *** 对齐线
     #+begin_src emacs-lisp
       (when (graphic-p)
 	(straight-use-package 'highlight-indent-guides)
 
 	(leaf highlight-indent-guides
-	  :hook
-	  (prog-mode-hook .  highlight-indent-guides-mode)
+	  :hook (prog-mode-hook text-mode-hook org-mode-hook)
 	  :config
-	  (setq highlight-indent-guides-method (if window-system 'character 'nil))
-	  (setq highlight-indent-guides-responsive 'stack)))
+	  (setq highlight-indent-guides-method 'bitmap)))
     #+end_src
 *** Doom-modeline
     #+begin_src emacs-lisp
       (straight-use-package 'doom-modeline)
-
       (leaf doom-modeline
-	:hook
-	(after-init-hook . doom-modeline-mode))
+	:hook after-init-hook
+	:defun doom-modeline-def-segment
+	:custom
+	((doom-modeline-height                      . 25)
+	 (doom-modeline-bar-width                   . 3)
+	 (doom-modeline-window-width-limit          . fill-column)
+	 (doom-modeline-project-detection           . 'project)  ;; changed
+	 (doom-modeline-buffer-file-name-style      . 'auto)
+	 ((doom-modeline-icon                       ;; changed
+	   doom-modeline-major-mode-icon
+	   doom-modeline-major-mode-color-icon
+	   doom-modeline-buffer-state-icon
+	   doom-modeline-buffer-modification-icon
+	   doom-modeline-unicode-fallback           ;; changed
+	   doom-modeline-minor-modes                ;; changed
+	   doom-modeline-enable-word-count)         ;; changed
+	  . t)
+	 (doom-modeline-continuous-word-count-modes . '(markdown-mode gfm-mode org-mode text-mode))
+	 (doom-modeline-buffer-encoding             . nil)  ;; changed
+	 (doom-modeline-indent-info                 . nil)
+	 (doom-modeline-checker-simple-format       . nil)  ;; changed
+	 (doom-modeline-number-limit                . 99)
+	 (doom-modeline-vcs-max-length              . 12)
+	 (doom-modeline-persp-name                  . nil)  ;; changed
+	 (doom-modeline-display-default-persp-name  . nil)
+	 (doom-modeline-lsp                         . t)
+	 (doom-modeline-github                      . t)
+	 `(doom-modeline-github-interval            . ,(* 30 60))
+	 (doom-modeline-modal-icon                  . t)
+
+	 ((doom-modeline-env-version
+	   doom-modeline-env-enable-python
+	   doom-modeline-env-enable-ruby
+	   doom-modeline-env-enable-perl
+	   doom-modeline-env-enable-go
+	   doom-modeline-env-enable-elixir
+	   doom-modeline-env-enable-rust)
+	  . t)
+
+	 (doom-modeline-env-python-executable . "python")
+	 (doom-modeline-env-ruby-executable   . "ruby")
+	 (doom-modeline-env-perl-executable   . "perl")
+	 (doom-modeline-env-go-executable     . "go")
+	 (doom-modeline-env-elixir-executable . "iex")
+	 (doom-modeline-env-rust-executable   . "rustc")
+
+	 (doom-modeline-env-load-string . "...")
+
+	 (doom-modeline-mu4e        . t)
+	 (doom-modeline-irc         . t)
+	 (doom-modeline-irc-stylize . 'identity)))
     #+end_src
+
+*** Doom-Themes
+    #+begin_src emacs-lisp
+      (straight-use-package 'doom-themes)
+
+      (leaf doom-themes
+	:custom
+	((doom-dracula-brighter-comments
+	  doom-dracula-colorful-headers
+	  doom-dracula-comment-bg) . t)
+	(doom-themes-treemacs-theme . "doom-colors")
+	:config
+	(after-x 'treemacs
+	  (doom-themes-treemacs-config))
+	(doom-themes-visual-bell-config)
+	(after-x 'org-mode
+	  (doom-themes-org-config)))
+    #+end_src    
+
 *** Dashboard
     #+begin_src emacs-lisp
       (straight-use-package 'dashboard)
+
+      (leaf page-break-lines
+	:doc "Emacs: display ugly ^L page breaks as tidy horizontal lines"
+	:url "https://github.com/purcell/page-break-lines"
+	:tag "convenience" "faces"
+	:hook
+	(after-init-hook . global-page-break-lines-mode)
+	(nasy/font-change-hook
+	 . (lambda ()
+	     (progn
+	       (nasy/change-char-width page-break-lines-char 2)
+	       (nasy/set-symbol ?⊸ 18 nil))))
+	:custom
+	(page-break-lines-char . ?⊸))
 
       (leaf dashboard
 	:config
 	(dashboard-setup-startup-hook))
     #+end_src
-* Editor
+
+*** Minions
+    #+begin_src emacs-lisp
+      (straight-use-package 'minions)
+      (leaf minions
+	:hook after-init-hook
+	:custom (minions-mode-line-lighter . "✬"))
+    #+end_src
+
+* 编辑器
   #+begin_src emacs-lisp
     ;; 自动加载外部修改过的文件
     (global-auto-revert-mode 1)
@@ -197,7 +371,9 @@
     ;; y-or-n
     (fset 'yes-or-no-p 'y-or-n-p)
   #+end_src
-* Packages
+
+* 包
+
 ** Ivy
    #+begin_src emacs-lisp
      (straight-use-package 'ivy)
@@ -214,28 +390,28 @@
        :emacs>= 24.5
        :leaf-defer nil
        :custom ((ivy-initial-inputs-alist . nil)
-		(ivy-use-selectable-prompt . t))
+                (ivy-use-selectable-prompt . t))
        :global-minor-mode t
        :config
        (leaf swiper
-	 :doc "Isearch with an overview. Oh, man!"
-	 :req "emacs-24.5" "ivy-0.13.0"
-	 :tag "matching" "emacs>=24.5"
-	 :url "https://github.com/abo-abo/swiper"
-	 :emacs>= 24.5
-	 :bind (("C-s" . swiper)))
+         :doc "Isearch with an overview. Oh, man!"
+         :req "emacs-24.5" "ivy-0.13.0"
+         :tag "matching" "emacs>=24.5"
+         :url "https://github.com/abo-abo/swiper"
+         :emacs>= 24.5
+         :bind (("C-s" . swiper)))
 
        (leaf counsel
-	 :doc "Various completion functions using Ivy"
-	 :req "emacs-24.5" "swiper-0.13.0"
-	 :tag "tools" "matching" "convenience" "emacs>=24.5"
-	 :url "https://github.com/abo-abo/swiper"
-	 :emacs>= 24.5
-	 :bind (("C-S-s" . counsel-imenu)
-		("C-x C-r" . counsel-recentf))
-	 :custom `((counsel-yank-pop-separator . "\n----------\n")
-		   (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
-	 :global-minor-mode t))
+         :doc "Various completion functions using Ivy"
+         :req "emacs-24.5" "swiper-0.13.0"
+         :tag "tools" "matching" "convenience" "emacs>=24.5"
+         :url "https://github.com/abo-abo/swiper"
+         :emacs>= 24.5
+         :bind (("C-S-s" . counsel-imenu)
+                ("C-x C-r" . counsel-recentf))
+         :custom `((counsel-yank-pop-separator . "\n----------\n")
+                   (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
+         :global-minor-mode t))
 
      (leaf ivy-posframe
        :hook (ivy-mode-hook)
@@ -249,6 +425,7 @@
      (leaf ivy-rich
        :global-minor-mode t)
    #+end_src
+
 ** Company
    #+begin_src emacs-lisp
      (straight-use-package 'company)
@@ -258,15 +435,16 @@
        (after-init-hook . global-company-mode)
        :init
        (setq company-tooltip-align-annotations t company-idle-delay 0.1 company-echo-delay 0
-	     company-minimum-prefix-length 2 company-require-match nil company-dabbrev-ignore-case
-	     nil company-dabbrev-downcase nil company-show-numbers t)
+             company-minimum-prefix-length 2 company-require-match nil company-dabbrev-ignore-case
+             nil company-dabbrev-downcase nil company-show-numbers t)
        :bind
        ((:company-active-map
-	 ("M-n" . nil) 
-	 ("M-p" . nil) 
-	 ("C-n" . company-select-next) 
-	 ("C-p" . company-select-previous))))
+         ("M-n" . nil)
+         ("M-p" . nil)
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))))
    #+end_src
+
 ** Lsp-mode
    #+begin_src emacs-lisp
      (straight-use-package 'lsp-mode)
@@ -274,6 +452,7 @@
      (leaf lsp-mode
        :commands lsp)
    #+end_src
+
 ** Flycheck
    #+begin_src emacs-lisp
      (straight-use-package 'flycheck)
@@ -282,21 +461,33 @@
        :init
        (global-flycheck-mode))
    #+end_src
+
 ** Org-babel
    #+begin_src emacs-lisp
    (custom-set-variables
       '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
       '(org-confirm-babel-evaluate nil))
    #+end_src
+
 ** Telega
    #+begin_src emacs-lisp
      (straight-use-package 'telega)
    #+end_src
+
 ** Exec-path-from-shell
    #+begin_src emacs-lisp
      (straight-use-package 'exec-path-from-shell)
      (exec-path-from-shell-initialize)
    #+end_src
+
+** Org-mode
+   #+begin_src emacs-lisp
+     (leaf org
+       :custom
+       (org-ellipsis . " ﹅")
+       (org-startup-folded    . 'content))
+   #+end_src
+
 ** Org-static-blog
    #+begin_src emacs-lisp
      (straight-use-package 'org-static-blog)
@@ -342,7 +533,52 @@
      (setq org-static-blog-index-front-matter
      "<h1> Ethereal Horizon </h1>\n")
    #+end_src
-* Languages
+
+** Org-superstar-mode
+   #+begin_src emacs-lisp
+     (straight-use-package 'org-superstar)
+
+     (leaf org-superstar
+       :hook
+       (org-mode-hook)
+       (nasy/font-change-hook
+	. (lambda ()
+	    (progn
+	      (nasy/set-symbol ?☯ 21 nil)
+	      (nasy/set-symbol ?✿ 18 nil)
+	      (nasy/set-symbol ?❀ 16 nil)
+	      (nasy/set-symbol ?✫ 15 nil)
+	      (nasy/set-symbol ?✸ 16 nil)
+	      (nasy/set-symbol ?◉ 16 nil)
+	      (nasy/set-symbol ?✼ 12 nil)
+	      (nasy/set-symbol ?✚ 12 nil)
+	      (nasy/set-symbol ?⁍ 13 nil)
+	      (nasy/change-char-width ?☯ 2)
+	      (nasy/change-char-width ?✿ 2)
+	      (nasy/change-char-width ?❀ 2)
+	      (nasy/change-char-width ?✫ 2)
+	      (nasy/change-char-width ?✸ 2)
+	      (nasy/change-char-width ?◉ 2)
+	      (nasy/change-char-width ?✼ 1)
+	      (nasy/change-char-width ?✚ 1)
+	      (nasy/change-char-width ?⁍ 1))))
+       :custom
+       ((org-superstar-special-todo-items . t)
+	(org-superstar-headline-bullets-list
+	 . '("☯"
+	     "✿"
+	     "❀"
+	     "✫"
+	     "✸"
+	     "◉"))
+	(org-superstar-item-bullet-alist
+	 . '((?* . ?✼)
+	     (?+ . ?✚)
+	     (?- . ?⁍)))))
+   #+end_src
+
+* 编程语言
+
 ** Haskell
    #+begin_src emacs-lisp
      (straight-use-package 'haskell-mode)
@@ -353,6 +589,7 @@
      (leaf inf-haskell
        :require t)
    #+end_src
+
 ** Golang
    #+begin_src emacs-lisp
      (straight-use-package 'go-mode)
