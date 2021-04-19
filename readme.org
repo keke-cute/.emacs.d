@@ -341,7 +341,10 @@
 
       (leaf dashboard
 	:config
-	(dashboard-setup-startup-hook))
+	(dashboard-setup-startup-hook)
+	(setq dashboard-set-heading-icons t)
+	(setq dashboard-set-file-icons t)
+	(setq dashboard-banner-logo-title ";; Happy Hacking Keke , Emacs ❤ You ~"))
     #+end_src
 
 *** Minions
