@@ -1,0 +1,10 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("toshiba"
+ (filename . "/ssh:keke@192.168.2.3:/mnt/media/toshiba/")
+ (front-context-string . "adult\n  drwxr-xr")
+ (rear-context-string . "17 Apr 26 12:15 ")
+ (position . 225))
+)

@@ -6,7 +6,6 @@ readme.el
 nasy-theme.el
 .cache/
 recentf
-bookmarks
 eshell/
 tramp
 rime/
