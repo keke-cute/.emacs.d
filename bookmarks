@@ -2,9 +2,9 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("toshiba"
- (filename . "/ssh:keke@192.168.2.3:/mnt/media/toshiba/")
- (front-context-string . "adult\n  drwxr-xr")
- (rear-context-string . "17 Apr 26 12:15 ")
- (position . 225))
+(("media"
+ (filename . "/sshx:192.168.2.3:/mnt/media/")
+ (front-context-string . "kpool\n  drwxr-xr")
+ (rear-context-string . " 3 May  5 17:39 ")
+ (position . 207))
 )
