@@ -1,1 +1,907 @@
-#+title: 我的 Emacs 配置文件#+author: keke#+email: librek@protonmail.com#+date: <2021-05-06 Thu>#+export_file_name: ~/Repos/keke-cute.github.io/emacs.html#+options: creator:t author:t#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>* 包管理器与配置包(Straight.el & Leaf)  #+begin_src emacs-lisp    ;; See https://github.com/raxod502/straight.el/issues/742. Remove this    ;; advice once that pull request is merged into master.    (define-advice straight--build-native-compile	(:around (oldfun &rest args) fix-native-comp-test)      "Properly disable native compilation on unsupported Emacsen."      (when (and (fboundp 'native-comp-available-p)		 (native-comp-available-p)		 (fboundp 'native-compile-async))	(apply oldfun args)))    ;;---------------------------------------------------------------------    (defvar bootstrap-version)    (let ((bootstrap-file	   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))	  (bootstrap-version 5))      (unless (file-exists-p bootstrap-file)	(with-current-buffer	    (url-retrieve-synchronously	     "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"	     'silent 'inhibit-cookies)	  (goto-char (point-max))	  (eval-print-last-sexp)))      (load bootstrap-file nil 'nomessage))  #+end_src  #+begin_src emacs-lisp    (straight-use-package 'leaf)    (straight-use-package 'leaf-keywords)    (leaf-keywords-init)    (straight-use-package 'magit)  #+end_src* 自动加载  [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-libs.org]]  #+begin_src emacs-lisp    ;;;###autoload    (if (fboundp 'with-eval-after-load)	(defalias 'after-x 'with-eval-after-load)      (defmacro after-x (feature &rest body)	"Eval BODY afetr FEATURE have loaded."	(declare (indent defun))	`(eval-after-load ,feature	   '(progn ,@body))))  #+end_src  [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-text.org]]  #+begin_src emacs-lisp    ;;;###autoload    (defun nasy/change-char-width (char width)      "Change CHAR width to WIDTH."      (let ((table (make-char-table nil)))	(set-char-table-parent table char-width-table)	(set-char-table-range table char width)	(setq char-width-table table)))  #+end_src  [[https://github.com/nasyxx/emacs.d/tree/master/literate-config/ui]]  #+begin_src emacs-lisp    (defvar nasy/font-change-hook nil      "Hooks to run after font changed.")    (defun nasy/check-font (font)      "Check if FONT avaliable."      (if (find-font (font-spec :family font				:weight *font-main-weight*				:size   *font-main-size*))	  t	(message (format "`%s' font not find" font))))    (defun nasy/set-default-font (charset &optional size frame)      "Set CHARSET fontset to default *font-main* with SIZE on FRAME."      (when (and (display-graphic-p)		(nasy/check-font *font-main-family*))	(let ((size (or size *font-main-size*)))	  (set-fontset-font t			    charset			    (font-spec :family *font-main-family*				       :weight *font-main-weight*				       :size   size)			    frame			    'prepend))))    (defun nasy/set-hanamin (charset &optional size frame)      "Set CHARSET fontset to HanaMin with SIZE on FRAME.    https://github.com/cjkvi/HanaMinAFDKO/releases    Font for char like 𨉚."      (when (display-graphic-p)	(let ((size (or size *font-cjk-size*)))	  (when (nasy/check-font "HanaMinB")	    (set-fontset-font (frame-parameter nil 'font)			      charset			      (font-spec :family "HanaMinB"					 :weight 'normal					 :size   size)			      frame			      'prepend))	  (when (nasy/check-font "HanaMinA")	    (set-fontset-font (frame-parameter nil 'font)			      charset			      (font-spec :family "HanaMinA"					 :weight 'normal					 :size   size)			      frame			      'prepend))	  (setf (alist-get ".*HanaMinA.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)		,*font-cjk-scale*)	  (setf (alist-get ".*HanaMinB.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)		,*font-cjk-scale*)	  (cl-loop for sfx in (reverse '("A" "B" "C" "Ex A1" "Ex A2" "Ex B" "Ex C" "I"))		   for hfont = (concat "Hanazono Mincho " sfx)		   do		   (progn		     (when (nasy/check-font hfont)		       (set-fontset-font (frame-parameter nil 'font)					 charset					 (font-spec :family hfont						    :weight 'normal						    :size   size)					 frame					 'prepend))		    (setf (alist-get (format ".*%s.*" hfont)				     face-font-rescale-alist				     ,*font-cjk-scale*				     nil				     'string=)			  ,*font-cjk-scale*))))))    (defun nasy/set-symbol (charset &optional size weight frame)	"Set CHARSET fontset to HanaMin with SIZE with WEIGHT on FRAME.      Font for char like ∷."	(when (display-graphic-p)	  (let ((size (or size *font-symbol-size*)))	    (when (nasy/check-font *font-symbol-family*)	      (set-fontset-font (frame-parameter nil 'font)				charset				(font-spec :family *font-symbol-family*					   :weight weight					   :size   size)				frame				'prepend)))))    (defun nasy/set--font (frame)      "Nasy set font for `FRAME'."      (when (display-graphic-p)	;; default	(when (nasy/check-font *font-main-family*)	  (set-face-attribute	      'default nil	      :font (font-spec :family *font-main-family*			       :weight *font-main-weight*			       :size   *font-main-size*)))	;; 中文	(dolist (charset '(kana han cjk-misc bopomofo))	  (progn	    (nasy/set-hanamin charset)	    (cl-loop for fn in (reverse '("" "-2" "-3" "-4" "-5"))		     for fpf = (format "*font-cjk%s" fn)		     for ff  = (eval (intern (concat fpf "-family*")))		     for fw  = (eval (intern (concat fpf "-weight*")))		     for fs  = (eval (intern (concat fpf "-size*")))		     for fss = (eval (intern (concat fpf "-scale*")))		     do		     (progn		       (when (nasy/check-font ff)			 (set-fontset-font (frame-parameter nil 'font)					   charset					   (font-spec :family ff						      :weight fw						      :size   fs)					   frame					   'prepend))		       (let ((ffn (concat ".*" ff ".*")))			 (setf (alist-get ffn face-font-rescale-alist fss nil 'string=) fss))))))	(when (and *is-a-mac*		  (nasy/check-font "Apple Color Emoji"))	  ;; For NS/Cocoa	  (set-fontset-font (frame-parameter nil 'font)			    'symbol			    (font-spec :family "Apple Color Emoji")			    frame			    'prepend))	(when (nasy/check-font *font-symbol-family*)	  (set-fontset-font (frame-parameter nil 'font)			    'symbol			    (font-spec :family *font-symbol-family*				       :weight *font-symbol-weight*				       :size   *font-symbol-size*)			    frame			    'append))	(when (nasy/check-font *font-mode-line-family*)	  (set-face-attribute 'mode-line nil			      :font (font-spec :family *font-mode-line-family*					       :weight *font-mode-line-weight*					       :size   *font-mode-line-size*))	  (set-face-attribute 'mode-line-inactive nil			      :font (font-spec :family *font-mode-line-family*					       :weight *font-mode-line-weight*					       :size   *font-mode-line-size*)))	(when (nasy/check-font *font-tab-line-family*)	  (set-face-attribute 'tab-line nil			      :font (font-spec :family *font-tab-line-family*					       :weight *font-tab-line-weight*					       :size   *font-tab-line-size*)))	(when (nasy/check-font *font-header-line-family*)	  (set-face-attribute 'header-line nil			      :font (font-spec :family *font-header-line-family*					       :weight *font-header-line-weight*					       :size   *font-header-line-size*)))	(after-x 'doom-modeline	  (doom-modeline--set-char-widths doom-modeline-rhs-icons-alist)))      (run-hooks 'nasy/font-change-hook))    (defun nasy/set-font (&rest _)      "Nasy set font."      (interactive)      (nasy/set--font nil))    (add-hook #'after-init-hook #'nasy/set-font)    (add-hook #'after-make-frame-functions   #'nasy/set-font)    (add-hook #'server-after-make-frame-hook #'nasy/set-font)  #+end_src* 检测系统  #+begin_src emacs-lisp    (defconst *is-a-mac* (eq system-type 'darwin))    (defconst *is-a-linux* (eq system-type 'gnu/linux))    (defun graphic-p ()      (display-graphic-p))    ;;(when (file-directory-p "/run/current-system/profile/share/emacs/site-lisp")    ;;  (add-to-list 'load-path "/run/current-system/profile/share/emacs/site-lisp/")    ;;  (message "Hello, Guix System User")    ;;  (leaf exwm-systemtray    ;;    :commands    ;;    exwm-systemtray--init    ;;    exwm-systemtray--enable    ;;    :hook    ;;    (exwm-init-hook . exwm-systemtray--init)    ;;    (exwm-exit-hook . exwm-systemtray--exit)))    ;;(if (string= (system-name) "playground") ;; if    ;;    (load-file "~/.emacs.d/etc/init-guix.el") ;; then    ;;  (load-file "~/.emacs.d/etc/init-linux.el")) ;; else  #+end_src* 界面** 主要的一些设定   #+begin_src emacs-lisp     (setq inhibit-splash-screen t)     (when (graphic-p)       ;; default frame size       ;;(setq initial-frame-alist       ;;	'((width . 150)       ;;	  (height . 56)))       (setq org-startup-with-inline-images t)       (global-hl-line-mode t)       (scroll-bar-mode -1))   #+end_src** 指定模式禁用行号   #+begin_src emacs-lisp     ;; (defun my-inhibit-global-linum-mode ()     ;;   "Counter-act `global-linum-mode'."     ;;   (add-hook 'after-change-major-mode-hook     ;;             (lambda () (linum-mode 0))     ;;             :append :local))     ;;      ;; (leaf my-inhibit-global-linum-mode     ;;   :hook     ;;   (eshell-mode-hook . my-inhibit-global-linum-mode)     ;;   (term-mode-hook . my-inhibit-global-linum-mode)     ;;   (vterm-mode-hook . my-inhibit-global-linum-mode)     ;;   (telega-chat-mode-hook . my-inhibit-global-linum-mode)     ;;   (telega-root-mode-hook . my-inhibit-global-linum-mode))     ;;    #+end_src** 字体设定   #+begin_src emacs-lisp     (leaf nasy-font       :doc "一些默訒値。"       :custom       ((*font-main-family*   . "OperatorMonoSSmLig Nerd Font")        (*font-symbol-family* . "Symbola")        (*font-cjk-family*    . "STFLGQKJF")        (*font-cjk-2-family*  . "FZLiuGongQuanKaiShuJF")        ;; I.Ngaan' font from `http://founder.acgvlyric.org/iu/doku.php/造字:開源字型_i.顏體'.        (*font-cjk-3-family*  . "I.Ngaan")        (*font-cjk-4-family*  . "Kaiti SC")        (*font-cjk-5-family*  . "Kaiti TC")        ((*font-mode-line-family*          ,*font-header-line-family*          ,*font-tab-line-family*)         . "Recursive Mono Casual Static"))       (((*font-main-size*          ,*font-mode-line-size*)         . 14)        (*font-symbol-size* . 17)        ((*font-cjk-size*          ,*font-cjk-2-size*          ,*font-cjk-3-size*          ,*font-cjk-4-size*          ,*font-cjk-5-size*)         . nil)        ((*font-tab-line-size*          ,*font-header-line-size*)         . 12))       ((*font-cjk-scale*          ,*font-cjk-2-scale*          ,*font-cjk-3-scale*          ,*font-cjk-4-scale*          ,*font-cjk-5-scale*)        . 1.3)       ((*font-main-weight*         ,*font-symbol-weight*         ,*font-cjk-weight*         ,*font-cjk-2-weight*         ,*font-cjk-3-weight*         ;; *font-cjk-4-weight*         ;; *font-cjk-5-weight*         ,*font-mode-line-weight*         ,*font-tab-line-weight*         ,*font-header-line-weight*)        . 'normal)       ((*font-cjk-4-weight*         ,*font-cjk-5-weight*) . 'bold))   #+end_src** 设定macOS上的窗口样式   #+begin_src emacs-lisp     (leaf mac-frame       :when *is-a-mac*       :config       (defun stop-minimizing-window ()         "Stop minimizing window under macOS."         (interactive)         (unless (and *is-a-mac*                     window-system)           (suspend-frame)))       :custom       (default-frame-alist         . '((ns-transparent-titlebar . t)             (ns-appearance           . light)             (alpha                   . (80 . 75))             (vertical-scroll-bars    . nil)             (internal-border-width   . 24))))   #+end_src** 主题设定   #+begin_src emacs-lisp     (load-theme 'nasy t)   #+end_src** 工具栏设定   #+begin_src emacs-lisp     (leaf tool-bar       :tag "builtin"       :bind       (:tool-bar-map	([copy]            . nil)	([cut]             . nil)	([dired]           . nil)	([isearch-forward] . nil)	([new-file]        . nil)	([open-file]       . nil)	([paste]           . nil)	([save-buffer]     . nil)	([undo]            . nil)	([yank]            . nil)))	;; ([dashboard-refresh-buffer]	;;  . `(menu-item))))   #+end_src** 一些关于界面的插件*** 彩虹括号    #+begin_src emacs-lisp      (straight-use-package 'rainbow-delimiters)      (leaf rainbow-delimiters        :hook        (prog-mode-hook . rainbow-delimiters-mode)        :config        ;; 设置每一级括号的颜色        (custom-set-faces         '(rainbow-delimiters-base-face    ((t (:inherit nil :weight bold))))         '(rainbow-delimiters-depth-1-face ((t (:inherit rainbow-delimiters-base-face :foreground "dark orange"))))         '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "gold"))))         '(rainbow-delimiters-depth-3-face ((t (:inherit rainbow-delimiters-base-face :foreground "YellowGreen"))))         '(rainbow-delimiters-depth-4-face ((t (:inherit rainbow-delimiters-base-face :foreground "LimeGreen"))))         '(rainbow-delimiters-depth-5-face ((t (:inherit rainbow-delimiters-base-face :foreground "dodger blue"))))         '(rainbow-delimiters-depth-6-face ((t (:inherit rainbow-delimiters-base-face :foreground "MediumSlateBlue"))))         '(rainbow-delimiters-depth-7-face ((t (:inherit rainbow-delimiters-base-face :foreground "blue violet"))))         '(rainbow-delimiters-depth-8-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))         '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))))    #+end_src*** 彩虹猫    #+begin_src emacs-lisp      (straight-use-package 'nyan-mode)      (leaf nyan-mode	:custom (nyan-animate-nyancat . t)		(nyan-bar-length      . 16)		(nyan-wavy-trail      . t)	:hook after-init-hook)    #+end_src*** 对齐线    #+begin_src emacs-lisp      (when (graphic-p)	(straight-use-package 'highlight-indent-guides)	(leaf highlight-indent-guides	  :hook (prog-mode-hook text-mode-hook org-mode-hook)	  :config	  (setq highlight-indent-guides-method 'bitmap)))    #+end_src*** Doom-modeline    #+begin_src emacs-lisp      (straight-use-package 'doom-modeline)      (leaf doom-modeline	:hook after-init-hook	:custom	((doom-modeline-height                      . 25)	 (doom-modeline-bar-width                   . 5)	 (doom-modeline-window-width-limit          . fill-column))	(doom-modeline-buffer-encoding             . nil)	(doom-modeline-indent-info                 . nil)	(doom-modeline-persp-name                  . nil)	(doom-modeline-display-default-persp-name  . nil)	(doom-modeline-checker-simple-format       . nil))    #+end_src*** Doom-Themes    #+begin_src emacs-lisp      (straight-use-package 'doom-themes)      (leaf doom-themes	:custom	((doom-dracula-brighter-comments	  doom-dracula-colorful-headers	  doom-dracula-comment-bg) . t)	(doom-themes-treemacs-theme . "doom-colors")	:config	(after-x 'treemacs	  (doom-themes-treemacs-config))	(doom-themes-visual-bell-config)	(after-x 'org-mode	  (doom-themes-org-config)))    #+end_src    *** Dashboard    #+begin_src emacs-lisp      (straight-use-package 'dashboard)      (leaf page-break-lines	:doc "Emacs: display ugly ^L page breaks as tidy horizontal lines"	:url "https://github.com/purcell/page-break-lines"	:tag "convenience" "faces"	:hook	(after-init-hook . global-page-break-lines-mode)	(nasy/font-change-hook	 . (lambda ()	     (progn	       (nasy/change-char-width page-break-lines-char 2)	       (nasy/set-symbol ?⊸ 18 nil))))	:custom	(page-break-lines-char . ?⊸))      (leaf dashboard	:commands dashboard-setup-startup-hook	:preface	(defun nasy/wfw1 (&rest _)	  "Widget forward 1."	  (interactive)	  (widget-forward 1))	(defun nasy/fw2 (&rest _)	  "Forward 2 chars."	  (interactive "p")	  (forward-char 2))	(defun nasy/-recentf (&rest _)	  (interactive)	  (counsel-recentf))	(defun nasy/-bookmarks (&rest _)	  (interactive)	  (bookmark-jump))	(defun nasy/-projects (&rest _)	  (interactive)	  (counsel-projectile-switch-project))	(defun nasy/-dashboard-items (list-size)	  (insert "\n")	  (insert "🌓 ")	  (widget-create 'item			 :tag "Recent Files (r)"			 :action #'nasy/-recentf			 :mouse-face 'highlight			 :button-face 'dashboard-heading			 :button-prefix ""			 :button-suffix ""			 :format "%[%t%]")	  (insert "\n\n")	  (insert "📚")	  (insert " ")	  (widget-create 'item			 :tag "Bookmarks (b)"			 :action #'nasy/-bookmarks			 :mouse-face 'highlight			 :button-face 'dashboard-heading			 :button-prefix ""			 :button-suffix ""			 :format "%[%t%]")	  (insert "\n\n")	  (insert "🚀 ")	  (widget-create 'item			 :tag "Projects (p)"			 :action #'nasy/-projects			 :mouse-face 'highlight			 :button-face 'dashboard-heading			 :button-prefix ""			 :button-suffix ""			 :format "%[%t%]")	  (insert "\n"))	:bind	("<f5>" . dashboard-refresh-buffer)	(:dashboard-mode-map	 ("r"              . counsel-recentf)	 ("p"              . counsel-projectile-switch-project)	 ("b"              . counsel-bookmark)	 ("g"              . dashboard-refresh-buffer))	:hook ((dashboard-mode-hook . (lambda () (setq tab-width 1)))	 	       (after-init-hook     . dashboard-setup-startup-hook))	:custom	(dashboard-org-agenda-categories . '("Calendar" "Tasks" "Appointments"))	`(dashboard-startup-banner       . ,(expand-file-name "n_icon.png" user-emacs-directory))	(dashboard-items . '((n-items . t)))	(dashboard-item-generators . '((n-items   . nasy/-dashboard-items)))	((dashboard-center-content	  dashboard-show-shortcuts	  dashboard-set-heading-icons	  dashboard-set-file-icons	  dashboard-set-init-info	  show-week-agenda-p	  dashboard-set-navigator) . t)	:config	:init	(after-x 'all-the-icons	  (setq dashboard-navigator-buttons		`(;; line1		  ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)		    "Source"		    "Source Page"		    (lambda (&rest _) (browse-url "https://github.com/keke-cute/.emacs.d")))		   (,(all-the-icons-octicon "gear" :height 1.1 :v-adjust 0.0)		    "Config"		    "Config File"		    (lambda (&rest _)		      (let ((upath (expand-file-name "readme.org" user-emacs-directory))			    (epath (expand-file-name "init.el" user-emacs-directory)))			(when (and (file-exists-p epath)				  (not (file-exists-p upath)))			  (copy-file epath upath))			(find-file upath))))		   (,(all-the-icons-octicon "book" :height 1.1 :v-adjust 0.0)		    "Document"		    "Document Page"		    (lambda (&rest _) (browse-url "https://keke-cute.github.io/emacs.html"))))))))	;; :advice)	;; (:after dashboard-next-line     nasy/fw2)	;; (:after widget-forward          nasy/fw2)	;; (:after widget-backward         nasy/fw2))      (setq-default       initial-scratch-message     (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")       dashboard-banner-logo-title (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")       ;; initial-buffer-choice       #'(lambda () (get-buffer "*dashboard*"))  ;; It will cause error if you start emacs from Command line with file name										;; https://github.com/rakanalh/emacs-dashboard/issues/69      )    #+end_src* 编辑器  #+begin_src emacs-lisp    ;; 自动加载外部修改过的文件    (global-auto-revert-mode 1)    ;; 关闭自己生产的保存文件    (setq auto-save-default nil)    ;; 关闭自己生产的备份文件    (setq make-backup-files nil)    ;; 选中某个区域继续编辑可以替换掉该区域    (delete-selection-mode 1)    ;; 设置h 文件默认为c++文件    (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))    ;; orgmode    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))    ;; without lock files    (setq create-lockfiles nil)    ;; y-or-n    (fset 'yes-or-no-p 'y-or-n-p)  #+end_src* 包** Ivy   #+begin_src emacs-lisp     (straight-use-package 'ivy)     (straight-use-package 'swiper)     (straight-use-package 'counsel)     (straight-use-package 'counsel-projectile)     (straight-use-package 'ivy-posframe)     (straight-use-package 'all-the-icons-ivy-rich)     (leaf ivy       :doc "Incremental Vertical completYon"       :req "emacs-24.5"       :tag "matching" "emacs>=24.5"       :url "https://github.com/abo-abo/swiper"       :emacs>= 24.5       :leaf-defer nil       :custom ((ivy-initial-inputs-alist . nil)		(ivy-use-selectable-prompt . t))       :global-minor-mode t       :config       (leaf swiper	 :doc "Isearch with an overview. Oh, man!"	 :req "emacs-24.5" "ivy-0.13.0"	 :tag "matching" "emacs>=24.5"	 :url "https://github.com/abo-abo/swiper"	 :emacs>= 24.5	 :bind (("C-s" . swiper)))       (leaf counsel	 :doc "Various completion functions using Ivy"	 :req "emacs-24.5" "swiper-0.13.0"	 :tag "tools" "matching" "convenience" "emacs>=24.5"	 :url "https://github.com/abo-abo/swiper"	 :emacs>= 24.5	 :bind (("C-S-s" . counsel-imenu)		("C-x C-r" . counsel-recentf))	 :custom `((counsel-yank-pop-separator . "\n----------\n")		   (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))	 :global-minor-mode t))     (leaf ivy-posframe       :hook (ivy-mode-hook)       :mode-hook       (setq ivy-auto-shrink-minibuffer-alist nil)       :global-minor-mode t)     (leaf all-the-icons-ivy-rich       :global-minor-mode t)     (leaf ivy-rich       :global-minor-mode t)   #+end_src** Projectile   #+begin_src emacs-lisp     (straight-use-package 'projectile)     (leaf projectile       :config       (projectile-mode +1))   #+end_src** Company   #+begin_src emacs-lisp     (straight-use-package 'company)     (leaf company       :hook       (after-init-hook . global-company-mode)       :init       (setq company-tooltip-align-annotations t company-idle-delay 0.1 company-echo-delay 0             company-minimum-prefix-length 2 company-require-match nil company-dabbrev-ignore-case             nil company-dabbrev-downcase nil company-show-numbers t)       :bind       ((:company-active-map         ("M-n" . nil)         ("M-p" . nil)         ("C-n" . company-select-next)         ("C-p" . company-select-previous))))   #+end_src** Lsp-mode   #+begin_src emacs-lisp     (straight-use-package 'lsp-mode)     (leaf lsp-mode       :commands lsp)   #+end_src** Flycheck   #+begin_src emacs-lisp     (straight-use-package 'flycheck)     (leaf flycheck       :hook prog-mode-hook)   #+end_src** Which-key   #+begin_src emacs-lisp     (straight-use-package 'which-key)     (leaf which-key       :doc "Emacs package that displays available keybindings in popup."       :url "https://github.com/justbur/emacs-which-key"       :tag "help"       :custom (which-key-allow-imprecise-window-fit . nil)       :hook 'after-init-hook)   #+end_src** Org-babel   #+begin_src emacs-lisp   (custom-set-variables      '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))      '(org-confirm-babel-evaluate nil))   #+end_src** Telega   #+begin_src emacs-lisp     (straight-use-package 'telega)   #+end_src** Emacs-Rime   #+begin_src emacs-lisp     (straight-use-package 'rime)     (leaf rime       :bind       (:rime-mode-map	("C-`"   . rime-send-keybinding)	("C-S-`" . rime-send-keybinding)	("C-,"   . rime-send-keybinding))       (:rime-active-mode-map	("C-;"   . rime-send-keybinding)	("C-SPC" . rime-send-keybinding))       :custom       `(rime-emacs-module-header-root    . ,(expand-file-name "/opt/local/include"))       `(rime-user-data-dir   . ,(expand-file-name "~/.config/rime"))       `(rime-librime-root    . ,(expand-file-name "/opt/local"))       (default-input-method  . "rime")       (rime-cursor           . "˰")       (rime-show-candidate   . 'posframe)       (rime-posframe-style   . 'vertical)       (rime-show-preedit     . t)       (rime-translate-keybindings	. '("C-f"	    "C-b"	    "C-n"	    "C-p"	    "C-g"	    "C-`"	    "C-;"	    "C-SPC"	    "<left>"	    "<right>"	    "<up>"	    "<down>"	    "<prior>"	    "<next>"	    "<delete>")))   #+end_src** Exec-path-from-shell   #+begin_src emacs-lisp     (straight-use-package 'exec-path-from-shell)     (exec-path-from-shell-initialize)   #+end_src** Org-mode   #+begin_src emacs-lisp     (leaf org       :custom       (org-ellipsis . " ﹅")       (org-startup-folded    . 'content))   #+end_src** Org-static-blog   #+begin_src emacs-lisp     (straight-use-package 'org-static-blog)     (setq org-static-blog-publish-title "Ethereal Horizon")     (setq org-static-blog-publish-url "https://keke-cute.github.io/")     (setq org-static-blog-publish-directory "~/Repos/keke-cute.github.io")     (setq org-static-blog-posts-directory "~/Repos/keke-cute.github.io/posts")     (setq org-static-blog-drafts-directory "~/Repos/keke-cute.github.io/drafts")     (setq org-static-blog-enable-tags t)     (setq org-export-with-toc nil)     (setq org-export-with-section-numbers nil)     ;; This header is inserted into the <head> section of every page:     ;;   (you will need to create the style sheet at     ;;    ~/projects/blog/static/style.css     ;;    and the favicon at     ;;    ~/projects/blog/static/favicon.ico)     (setq org-static-blog-page-header     "<meta name=\"author\" content=\"keke\">     <meta name=\"referrer\" content=\"no-referrer\">     <link href= \"static/style.css\" rel=\"stylesheet\" type=\"text/css\" />     <link rel=\"icon\" href=\"static/favicon.ico\">")     ;; This preamble is inserted at the beginning of the <body> of every page:     ;;   This particular HTML creates a <div> with a simple linked headline     (setq org-static-blog-page-preamble     "<div class=\"header\">       <a href=\"https://keke-cute.github.io\">Ethereal Horizon</a> <A href=\"https://keke-cute.github.io/emacs.html\">Emacs Configure</a>     </div>")     ;; This postamble is inserted at the end of the <body> of every page:     ;;   This particular HTML creates a <div> with a link to the archive page     ;;   and a licensing stub.     (setq org-static-blog-page-postamble     "<div id=\"archive\">       <a href=\"https://keke-cute.github.io/archive.html\">Other posts</a>     </div>     <center><a rel=\"license\" href=\"https://creativecommons.org/licenses/by-sa/3.0/\"><img alt=\"Creative Commons License\" style=\"border-width:0\" src=\"https://i.creativecommons.org/l/by-sa/3.0/88x31.png\" /></a><br /><span xmlns:dct=\"https://purl.org/dc/terms/\" href=\"https://purl.org/dc/dcmitype/Text\" property=\"dct:title\" rel=\"dct:type\">Ethereal Horizon</span> by <a xmlns:cc=\"https://creativecommons.org/ns#\" href=\"https://github.com/keke-cute\" property=\"cc:attributionName\" rel=\"cc:attributionURL\">不可视界线</a> is licensed under a <a rel=\"license\" href=\"https://creativecommons.org/licenses/by-sa/3.0/\">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.</center>")     ;; This HTML code is inserted into the index page between the preamble and     ;;   the blog posts     (setq org-static-blog-index-front-matter     "<h1> Ethereal Horizon </h1>\n")   #+end_src** Org-superstar-mode   #+begin_src emacs-lisp     (straight-use-package 'org-superstar)     (leaf org-superstar       :hook       (org-mode-hook)       (nasy/font-change-hook	. (lambda ()	    (progn	      (nasy/set-symbol ?☯ 21 nil)	      (nasy/set-symbol ?✿ 18 nil)	      (nasy/set-symbol ?❀ 16 nil)	      (nasy/set-symbol ?✫ 15 nil)	      (nasy/set-symbol ?✸ 16 nil)	      (nasy/set-symbol ?◉ 16 nil)	      (nasy/set-symbol ?✼ 12 nil)	      (nasy/set-symbol ?✚ 12 nil)	      (nasy/set-symbol ?⁍ 13 nil)	      (nasy/change-char-width ?☯ 2)	      (nasy/change-char-width ?✿ 2)	      (nasy/change-char-width ?❀ 2)	      (nasy/change-char-width ?✫ 2)	      (nasy/change-char-width ?✸ 2)	      (nasy/change-char-width ?◉ 2)	      (nasy/change-char-width ?✼ 1)	      (nasy/change-char-width ?✚ 1)	      (nasy/change-char-width ?⁍ 1))))       :custom       ((org-superstar-special-todo-items . t)	(org-superstar-headline-bullets-list	 . '("☯"	     "✿"	     "❀"	     "✫"	     "✸"	     "◉"))	(org-superstar-item-bullet-alist	 . '((?* . ?✼)	     (?+ . ?✚)	     (?- . ?⁍)))))   #+end_src* 编程语言** Haskell   #+begin_src emacs-lisp     (straight-use-package 'haskell-mode)     (leaf haskell-mode       :require t)     (leaf inf-haskell       :require t)   #+end_src** Golang   #+begin_src emacs-lisp     (straight-use-package 'go-mode)     (leaf go-mode       :hook       (go-mode-hook . lsp))   #+end_src
+#+title: 我的 Emacs 配置文件
+#+author: keke
+#+email: librek@protonmail.com
+#+date: <2021-05-06 Thu>
+#+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
+#+options: creator:t author:t
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
+* 包管理器与配置包(Straight.el & Leaf)
+  #+begin_src emacs-lisp
+    ;; See https://github.com/raxod502/straight.el/issues/742. Remove this
+    ;; advice once that pull request is merged into master.
+    (define-advice straight--build-native-compile
+	(:around (oldfun &rest args) fix-native-comp-test)
+      "Properly disable native compilation on unsupported Emacsen."
+      (when (and (fboundp 'native-comp-available-p)
+		 (native-comp-available-p)
+		 (fboundp 'native-compile-async))
+	(apply oldfun args)))
+    ;;---------------------------------------------------------------------
+
+    (defvar bootstrap-version)
+    (let ((bootstrap-file
+	   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	  (bootstrap-version 5))
+      (unless (file-exists-p bootstrap-file)
+	(with-current-buffer
+	    (url-retrieve-synchronously
+	     "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	     'silent 'inhibit-cookies)
+	  (goto-char (point-max))
+	  (eval-print-last-sexp)))
+      (load bootstrap-file nil 'nomessage))
+  #+end_src
+
+  #+begin_src emacs-lisp
+    (straight-use-package 'leaf)
+    (straight-use-package 'leaf-keywords)
+    (leaf-keywords-init)
+
+    (straight-use-package 'magit)
+  #+end_src
+
+* 自动加载
+  [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-libs.org]]
+  #+begin_src emacs-lisp
+    ;;;###autoload
+    (if (fboundp 'with-eval-after-load)
+	(defalias 'after-x 'with-eval-after-load)
+      (defmacro after-x (feature &rest body)
+	"Eval BODY afetr FEATURE have loaded."
+	(declare (indent defun))
+	`(eval-after-load ,feature
+	   '(progn ,@body))))
+  #+end_src
+
+  [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-text.org]]
+  #+begin_src emacs-lisp
+    ;;;###autoload
+    (defun nasy/change-char-width (char width)
+      "Change CHAR width to WIDTH."
+      (let ((table (make-char-table nil)))
+	(set-char-table-parent table char-width-table)
+	(set-char-table-range table char width)
+	(setq char-width-table table)))
+  #+end_src
+
+  [[https://github.com/nasyxx/emacs.d/tree/master/literate-config/ui]]
+  #+begin_src emacs-lisp
+    (defvar nasy/font-change-hook nil
+      "Hooks to run after font changed.")
+
+    (defun nasy/check-font (font)
+      "Check if FONT avaliable."
+      (if (find-font (font-spec :family font
+				:weight *font-main-weight*
+				:size   *font-main-size*))
+	  t
+	(message (format "`%s' font not find" font))))
+
+    (defun nasy/set-default-font (charset &optional size frame)
+      "Set CHARSET fontset to default *font-main* with SIZE on FRAME."
+      (when (and (display-graphic-p)
+		(nasy/check-font *font-main-family*))
+	(let ((size (or size *font-main-size*)))
+	  (set-fontset-font t
+			    charset
+			    (font-spec :family *font-main-family*
+				       :weight *font-main-weight*
+				       :size   size)
+			    frame
+			    'prepend))))
+
+    (defun nasy/set-hanamin (charset &optional size frame)
+      "Set CHARSET fontset to HanaMin with SIZE on FRAME.
+    https://github.com/cjkvi/HanaMinAFDKO/releases
+    Font for char like 𨉚."
+      (when (display-graphic-p)
+	(let ((size (or size *font-cjk-size*)))
+	  (when (nasy/check-font "HanaMinB")
+	    (set-fontset-font (frame-parameter nil 'font)
+			      charset
+			      (font-spec :family "HanaMinB"
+					 :weight 'normal
+					 :size   size)
+			      frame
+			      'prepend))
+	  (when (nasy/check-font "HanaMinA")
+	    (set-fontset-font (frame-parameter nil 'font)
+			      charset
+			      (font-spec :family "HanaMinA"
+					 :weight 'normal
+					 :size   size)
+			      frame
+			      'prepend))
+	  (setf (alist-get ".*HanaMinA.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)
+		,*font-cjk-scale*)
+	  (setf (alist-get ".*HanaMinB.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)
+		,*font-cjk-scale*)
+	  (cl-loop for sfx in (reverse '("A" "B" "C" "Ex A1" "Ex A2" "Ex B" "Ex C" "I"))
+		   for hfont = (concat "Hanazono Mincho " sfx)
+		   do
+		   (progn
+		     (when (nasy/check-font hfont)
+		       (set-fontset-font (frame-parameter nil 'font)
+					 charset
+					 (font-spec :family hfont
+						    :weight 'normal
+						    :size   size)
+					 frame
+					 'prepend))
+
+		    (setf (alist-get (format ".*%s.*" hfont)
+				     face-font-rescale-alist
+				     ,*font-cjk-scale*
+				     nil
+				     'string=)
+			  ,*font-cjk-scale*))))))
+
+    (defun nasy/set-symbol (charset &optional size weight frame)
+	"Set CHARSET fontset to HanaMin with SIZE with WEIGHT on FRAME.
+
+      Font for char like ∷."
+	(when (display-graphic-p)
+	  (let ((size (or size *font-symbol-size*)))
+	    (when (nasy/check-font *font-symbol-family*)
+	      (set-fontset-font (frame-parameter nil 'font)
+				charset
+				(font-spec :family *font-symbol-family*
+					   :weight weight
+					   :size   size)
+				frame
+				'prepend)))))
+
+    (defun nasy/set--font (frame)
+      "Nasy set font for `FRAME'."
+      (when (display-graphic-p)
+	;; default
+	(when (nasy/check-font *font-main-family*)
+	  (set-face-attribute
+	      'default nil
+	      :font (font-spec :family *font-main-family*
+			       :weight *font-main-weight*
+			       :size   *font-main-size*)))
+	;; 中文
+	(dolist (charset '(kana han cjk-misc bopomofo))
+	  (progn
+	    (nasy/set-hanamin charset)
+	    (cl-loop for fn in (reverse '("" "-2" "-3" "-4" "-5"))
+		     for fpf = (format "*font-cjk%s" fn)
+		     for ff  = (eval (intern (concat fpf "-family*")))
+		     for fw  = (eval (intern (concat fpf "-weight*")))
+		     for fs  = (eval (intern (concat fpf "-size*")))
+		     for fss = (eval (intern (concat fpf "-scale*")))
+		     do
+		     (progn
+		       (when (nasy/check-font ff)
+			 (set-fontset-font (frame-parameter nil 'font)
+					   charset
+					   (font-spec :family ff
+						      :weight fw
+						      :size   fs)
+					   frame
+					   'prepend))
+		       (let ((ffn (concat ".*" ff ".*")))
+			 (setf (alist-get ffn face-font-rescale-alist fss nil 'string=) fss))))))
+
+	(when (and *is-a-mac*
+		  (nasy/check-font "Apple Color Emoji"))
+	  ;; For NS/Cocoa
+	  (set-fontset-font (frame-parameter nil 'font)
+			    'symbol
+			    (font-spec :family "Apple Color Emoji")
+			    frame
+			    'prepend))
+
+	(when (nasy/check-font *font-symbol-family*)
+	  (set-fontset-font (frame-parameter nil 'font)
+			    'symbol
+			    (font-spec :family *font-symbol-family*
+				       :weight *font-symbol-weight*
+				       :size   *font-symbol-size*)
+			    frame
+			    'append))
+
+	(when (nasy/check-font *font-mode-line-family*)
+	  (set-face-attribute 'mode-line nil
+			      :font (font-spec :family *font-mode-line-family*
+					       :weight *font-mode-line-weight*
+					       :size   *font-mode-line-size*))
+
+	  (set-face-attribute 'mode-line-inactive nil
+			      :font (font-spec :family *font-mode-line-family*
+					       :weight *font-mode-line-weight*
+					       :size   *font-mode-line-size*)))
+	(when (nasy/check-font *font-tab-line-family*)
+	  (set-face-attribute 'tab-line nil
+			      :font (font-spec :family *font-tab-line-family*
+					       :weight *font-tab-line-weight*
+					       :size   *font-tab-line-size*)))
+	(when (nasy/check-font *font-header-line-family*)
+	  (set-face-attribute 'header-line nil
+			      :font (font-spec :family *font-header-line-family*
+					       :weight *font-header-line-weight*
+					       :size   *font-header-line-size*)))
+
+	(after-x 'doom-modeline
+	  (doom-modeline--set-char-widths doom-modeline-rhs-icons-alist)))
+      (run-hooks 'nasy/font-change-hook))
+
+    (defun nasy/set-font (&rest _)
+      "Nasy set font."
+      (interactive)
+      (nasy/set--font nil))
+
+
+    (add-hook #'after-init-hook #'nasy/set-font)
+    (add-hook #'after-make-frame-functions   #'nasy/set-font)
+    (add-hook #'server-after-make-frame-hook #'nasy/set-font)
+  #+end_src
+* 检测系统
+  #+begin_src emacs-lisp
+    (defconst *is-a-mac* (eq system-type 'darwin))
+    (defconst *is-a-linux* (eq system-type 'gnu/linux))
+
+    (defun graphic-p ()
+      (display-graphic-p))
+
+
+    ;;(when (file-directory-p "/run/current-system/profile/share/emacs/site-lisp")
+    ;;  (add-to-list 'load-path "/run/current-system/profile/share/emacs/site-lisp/")
+    ;;  (message "Hello, Guix System User")
+    ;;  (leaf exwm-systemtray
+    ;;    :commands
+    ;;    exwm-systemtray--init
+    ;;    exwm-systemtray--enable
+    ;;    :hook
+    ;;    (exwm-init-hook . exwm-systemtray--init)
+    ;;    (exwm-exit-hook . exwm-systemtray--exit)))
+
+    ;;(if (string= (system-name) "playground") ;; if
+    ;;    (load-file "~/.emacs.d/etc/init-guix.el") ;; then
+    ;;  (load-file "~/.emacs.d/etc/init-linux.el")) ;; else
+  #+end_src
+
+* 界面
+** 主要的一些设定
+   #+begin_src emacs-lisp
+     (setq inhibit-splash-screen t)
+     (when (graphic-p)
+       ;; default frame size
+       ;;(setq initial-frame-alist
+       ;;	'((width . 150)
+       ;;	  (height . 56)))
+       (setq org-startup-with-inline-images t)
+       (global-hl-line-mode t)
+       (scroll-bar-mode -1))
+   #+end_src
+
+** 指定模式禁用行号
+   #+begin_src emacs-lisp
+     ;; (defun my-inhibit-global-linum-mode ()
+     ;;   "Counter-act `global-linum-mode'."
+     ;;   (add-hook 'after-change-major-mode-hook
+     ;;             (lambda () (linum-mode 0))
+     ;;             :append :local))
+     ;; 
+     ;; (leaf my-inhibit-global-linum-mode
+     ;;   :hook
+     ;;   (eshell-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (term-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (vterm-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (telega-chat-mode-hook . my-inhibit-global-linum-mode)
+     ;;   (telega-root-mode-hook . my-inhibit-global-linum-mode))
+     ;; 
+   #+end_src
+
+** 字体设定
+   #+begin_src emacs-lisp
+     (leaf nasy-font
+       :doc "一些默訒値。"
+       :custom
+       ((*font-main-family*   . "OperatorMonoSSmLig Nerd Font")
+        (*font-symbol-family* . "Symbola")
+        (*font-cjk-family*    . "STFLGQKJF")
+        (*font-cjk-2-family*  . "FZLiuGongQuanKaiShuJF")
+        ;; I.Ngaan' font from `http://founder.acgvlyric.org/iu/doku.php/造字:開源字型_i.顏體'.
+        (*font-cjk-3-family*  . "I.Ngaan")
+        (*font-cjk-4-family*  . "Kaiti SC")
+        (*font-cjk-5-family*  . "Kaiti TC")
+        ((*font-mode-line-family*
+          ,*font-header-line-family*
+          ,*font-tab-line-family*)
+         . "Recursive Mono Casual Static"))
+
+       (((*font-main-size*
+          ,*font-mode-line-size*)
+         . 14)
+        (*font-symbol-size* . 17)
+        ((*font-cjk-size*
+          ,*font-cjk-2-size*
+          ,*font-cjk-3-size*
+          ,*font-cjk-4-size*
+          ,*font-cjk-5-size*)
+         . nil)
+        ((*font-tab-line-size*
+          ,*font-header-line-size*)
+         . 12))
+
+       ((*font-cjk-scale*
+          ,*font-cjk-2-scale*
+          ,*font-cjk-3-scale*
+          ,*font-cjk-4-scale*
+          ,*font-cjk-5-scale*)
+        . 1.3)
+
+       ((*font-main-weight*
+         ,*font-symbol-weight*
+         ,*font-cjk-weight*
+         ,*font-cjk-2-weight*
+         ,*font-cjk-3-weight*
+         ;; *font-cjk-4-weight*
+         ;; *font-cjk-5-weight*
+         ,*font-mode-line-weight*
+         ,*font-tab-line-weight*
+         ,*font-header-line-weight*)
+        . 'normal)
+
+       ((*font-cjk-4-weight*
+         ,*font-cjk-5-weight*) . 'bold))
+   #+end_src
+
+** 设定macOS上的窗口样式
+   #+begin_src emacs-lisp
+     (leaf mac-frame
+       :when *is-a-mac*
+       :config
+       (defun stop-minimizing-window ()
+         "Stop minimizing window under macOS."
+         (interactive)
+         (unless (and *is-a-mac*
+                     window-system)
+           (suspend-frame)))
+       :custom
+       (default-frame-alist
+         . '((ns-transparent-titlebar . t)
+             (ns-appearance           . light)
+             (alpha                   . (80 . 75))
+             (vertical-scroll-bars    . nil)
+             (internal-border-width   . 24))))
+   #+end_src
+
+** 主题设定
+   #+begin_src emacs-lisp
+     (load-theme 'nasy t)
+   #+end_src
+** 工具栏设定
+   #+begin_src emacs-lisp
+     (leaf tool-bar
+       :tag "builtin"
+       :bind
+       (:tool-bar-map
+	([copy]            . nil)
+	([cut]             . nil)
+	([dired]           . nil)
+	([isearch-forward] . nil)
+	([new-file]        . nil)
+	([open-file]       . nil)
+	([paste]           . nil)
+	([save-buffer]     . nil)
+	([undo]            . nil)
+	([yank]            . nil)))
+	;; ([dashboard-refresh-buffer]
+	;;  . `(menu-item))))
+   #+end_src
+
+** 一些关于界面的插件
+*** 彩虹括号
+    #+begin_src emacs-lisp
+      (straight-use-package 'rainbow-delimiters)
+
+      (leaf rainbow-delimiters
+        :hook
+        (prog-mode-hook . rainbow-delimiters-mode)
+        :config
+        ;; 设置每一级括号的颜色
+        (custom-set-faces
+         '(rainbow-delimiters-base-face    ((t (:inherit nil :weight bold))))
+         '(rainbow-delimiters-depth-1-face ((t (:inherit rainbow-delimiters-base-face :foreground "dark orange"))))
+         '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "gold"))))
+         '(rainbow-delimiters-depth-3-face ((t (:inherit rainbow-delimiters-base-face :foreground "YellowGreen"))))
+         '(rainbow-delimiters-depth-4-face ((t (:inherit rainbow-delimiters-base-face :foreground "LimeGreen"))))
+         '(rainbow-delimiters-depth-5-face ((t (:inherit rainbow-delimiters-base-face :foreground "dodger blue"))))
+         '(rainbow-delimiters-depth-6-face ((t (:inherit rainbow-delimiters-base-face :foreground "MediumSlateBlue"))))
+         '(rainbow-delimiters-depth-7-face ((t (:inherit rainbow-delimiters-base-face :foreground "blue violet"))))
+         '(rainbow-delimiters-depth-8-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))
+         '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))))
+    #+end_src
+
+*** 彩虹猫
+    #+begin_src emacs-lisp
+      (straight-use-package 'nyan-mode)
+      (leaf nyan-mode
+	:custom (nyan-animate-nyancat . t)
+		(nyan-bar-length      . 16)
+		(nyan-wavy-trail      . t)
+	:hook after-init-hook)
+
+    #+end_src
+
+*** 对齐线
+    #+begin_src emacs-lisp
+      (when (graphic-p)
+	(straight-use-package 'highlight-indent-guides)
+
+	(leaf highlight-indent-guides
+	  :hook (prog-mode-hook text-mode-hook org-mode-hook)
+	  :config
+	  (setq highlight-indent-guides-method 'bitmap)))
+    #+end_src
+*** Doom-modeline
+    #+begin_src emacs-lisp
+      (straight-use-package 'doom-modeline)
+
+      (leaf doom-modeline
+	:hook after-init-hook
+	:custom
+	((doom-modeline-height                      . 25)
+	 (doom-modeline-bar-width                   . 5)
+	 (doom-modeline-window-width-limit          . fill-column))
+	(doom-modeline-buffer-encoding             . nil)
+	(doom-modeline-indent-info                 . nil)
+	(doom-modeline-persp-name                  . nil)
+	(doom-modeline-display-default-persp-name  . nil)
+	(doom-modeline-checker-simple-format       . nil))
+    #+end_src
+
+*** Doom-Themes
+    #+begin_src emacs-lisp
+      (straight-use-package 'doom-themes)
+
+      (leaf doom-themes
+	:custom
+	((doom-dracula-brighter-comments
+	  doom-dracula-colorful-headers
+	  doom-dracula-comment-bg) . t)
+	(doom-themes-treemacs-theme . "doom-colors")
+	:config
+	(after-x 'treemacs
+	  (doom-themes-treemacs-config))
+	(doom-themes-visual-bell-config)
+	(after-x 'org-mode
+	  (doom-themes-org-config)))
+    #+end_src    
+
+*** Dashboard
+    #+begin_src emacs-lisp
+      (straight-use-package 'dashboard)
+
+      (leaf page-break-lines
+	:doc "Emacs: display ugly ^L page breaks as tidy horizontal lines"
+	:url "https://github.com/purcell/page-break-lines"
+	:tag "convenience" "faces"
+	:hook
+	(after-init-hook . global-page-break-lines-mode)
+	(nasy/font-change-hook
+	 . (lambda ()
+	     (progn
+	       (nasy/change-char-width page-break-lines-char 2)
+	       (nasy/set-symbol ?⊸ 18 nil))))
+	:custom
+	(page-break-lines-char . ?⊸))
+
+      (leaf dashboard
+	:commands dashboard-setup-startup-hook
+	:preface
+	(defun nasy/wfw1 (&rest _)
+	  "Widget forward 1."
+	  (interactive)
+	  (widget-forward 1))
+	(defun nasy/fw2 (&rest _)
+	  "Forward 2 chars."
+	  (interactive "p")
+	  (forward-char 2))
+	(defun nasy/-recentf (&rest _)
+	  (interactive)
+	  (counsel-recentf))
+	(defun nasy/-bookmarks (&rest _)
+	  (interactive)
+	  (bookmark-jump))
+	(defun nasy/-projects (&rest _)
+	  (interactive)
+	  (counsel-projectile-switch-project))
+	(defun nasy/-dashboard-items (list-size)
+	  (insert "\n")
+	  (insert "🌓 ")
+	  (widget-create 'item
+			 :tag "Recent Files (r)"
+			 :action #'nasy/-recentf
+			 :mouse-face 'highlight
+			 :button-face 'dashboard-heading
+			 :button-prefix ""
+			 :button-suffix ""
+			 :format "%[%t%]")
+	  (insert "\n\n")
+	  (insert "📚")
+	  (insert " ")
+	  (widget-create 'item
+			 :tag "Bookmarks (b)"
+			 :action #'nasy/-bookmarks
+			 :mouse-face 'highlight
+			 :button-face 'dashboard-heading
+			 :button-prefix ""
+			 :button-suffix ""
+			 :format "%[%t%]")
+	  (insert "\n\n")
+	  (insert "🚀 ")
+	  (widget-create 'item
+			 :tag "Projects (p)"
+			 :action #'nasy/-projects
+			 :mouse-face 'highlight
+			 :button-face 'dashboard-heading
+			 :button-prefix ""
+			 :button-suffix ""
+			 :format "%[%t%]")
+	  (insert "\n"))
+	:bind
+	("<f5>" . dashboard-refresh-buffer)
+	(:dashboard-mode-map
+	 ("r"              . counsel-recentf)
+	 ("p"              . counsel-projectile-switch-project)
+	 ("b"              . counsel-bookmark)
+	 ("g"              . dashboard-refresh-buffer))
+	:hook ((dashboard-mode-hook . (lambda () (setq tab-width 1)))	 
+	       (after-init-hook     . dashboard-setup-startup-hook))
+	:custom
+	(dashboard-org-agenda-categories . '("Calendar" "Tasks" "Appointments"))
+	`(dashboard-startup-banner       . ,(expand-file-name "n_icon.png" user-emacs-directory))
+	(dashboard-items . '((n-items . t)))
+	(dashboard-item-generators . '((n-items   . nasy/-dashboard-items)))
+	((dashboard-center-content
+	  dashboard-show-shortcuts
+	  dashboard-set-heading-icons
+	  dashboard-set-file-icons
+	  dashboard-set-init-info
+	  show-week-agenda-p
+	  dashboard-set-navigator) . t)
+	:config
+	:init
+	(after-x 'all-the-icons
+	  (setq dashboard-navigator-buttons
+		`(;; line1
+		  ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+		    "Source"
+		    "Source Page"
+		    (lambda (&rest _) (browse-url "https://github.com/keke-cute/.emacs.d")))
+		   (,(all-the-icons-octicon "gear" :height 1.1 :v-adjust 0.0)
+		    "Config"
+		    "Config File"
+		    (lambda (&rest _)
+		      (let ((upath (expand-file-name "readme.org" user-emacs-directory))
+			    (epath (expand-file-name "init.el" user-emacs-directory)))
+			(when (and (file-exists-p epath)
+				  (not (file-exists-p upath)))
+			  (copy-file epath upath))
+			(find-file upath))))
+		   (,(all-the-icons-octicon "book" :height 1.1 :v-adjust 0.0)
+		    "Document"
+		    "Document Page"
+		    (lambda (&rest _) (browse-url "https://keke-cute.github.io/emacs.html"))))))))
+	;; :advice)
+	;; (:after dashboard-next-line     nasy/fw2)
+	;; (:after widget-forward          nasy/fw2)
+	;; (:after widget-backward         nasy/fw2))
+
+      (setq-default
+       initial-scratch-message     (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
+       dashboard-banner-logo-title (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
+       ;; initial-buffer-choice       #'(lambda () (get-buffer "*dashboard*"))  ;; It will cause error if you start emacs from Command line with file name
+										;; https://github.com/rakanalh/emacs-dashboard/issues/69
+      )
+    #+end_src
+
+* 编辑器
+  #+begin_src emacs-lisp
+    ;; 自动加载外部修改过的文件
+    (global-auto-revert-mode 1)
+    ;; 关闭自己生产的保存文件
+    (setq auto-save-default nil)
+    ;; 关闭自己生产的备份文件
+    (setq make-backup-files nil)
+    ;; 选中某个区域继续编辑可以替换掉该区域
+    (delete-selection-mode 1)
+    ;; 设置h 文件默认为c++文件
+    (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+    ;; orgmode
+    (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+    ;; without lock files
+    (setq create-lockfiles nil)
+    ;; y-or-n
+    (fset 'yes-or-no-p 'y-or-n-p)
+  #+end_src
+
+* 包
+
+** Ivy
+   #+begin_src emacs-lisp
+     (straight-use-package 'ivy)
+     (straight-use-package 'swiper)
+     (straight-use-package 'counsel)
+     (straight-use-package 'counsel-projectile)
+     (straight-use-package 'ivy-posframe)
+     (straight-use-package 'all-the-icons-ivy-rich)
+
+     (leaf ivy
+       :doc "Incremental Vertical completYon"
+       :req "emacs-24.5"
+       :tag "matching" "emacs>=24.5"
+       :url "https://github.com/abo-abo/swiper"
+       :emacs>= 24.5
+       :leaf-defer nil
+       :custom ((ivy-initial-inputs-alist . nil)
+		(ivy-use-selectable-prompt . t))
+       :global-minor-mode t
+       :config
+       (leaf swiper
+	 :doc "Isearch with an overview. Oh, man!"
+	 :req "emacs-24.5" "ivy-0.13.0"
+	 :tag "matching" "emacs>=24.5"
+	 :url "https://github.com/abo-abo/swiper"
+	 :emacs>= 24.5
+	 :bind (("C-s" . swiper)))
+
+       (leaf counsel
+	 :doc "Various completion functions using Ivy"
+	 :req "emacs-24.5" "swiper-0.13.0"
+	 :tag "tools" "matching" "convenience" "emacs>=24.5"
+	 :url "https://github.com/abo-abo/swiper"
+	 :emacs>= 24.5
+	 :bind (("C-S-s" . counsel-imenu)
+		("C-x C-r" . counsel-recentf))
+	 :custom `((counsel-yank-pop-separator . "\n----------\n")
+		   (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
+	 :global-minor-mode t))
+
+     (leaf ivy-posframe
+       :hook (ivy-mode-hook)
+       :mode-hook
+       (setq ivy-auto-shrink-minibuffer-alist nil)
+       :global-minor-mode t)
+
+     (leaf all-the-icons-ivy-rich
+       :global-minor-mode t)
+
+     (leaf ivy-rich
+       :global-minor-mode t)
+   #+end_src
+
+** Projectile
+   #+begin_src emacs-lisp
+     (straight-use-package 'projectile)
+
+     (leaf projectile
+       :config
+       (projectile-mode +1))
+
+   #+end_src
+** Company
+   #+begin_src emacs-lisp
+     (straight-use-package 'company)
+
+     (leaf company
+       :hook
+       (after-init-hook . global-company-mode)
+       :init
+       (setq company-tooltip-align-annotations t company-idle-delay 0.1 company-echo-delay 0
+             company-minimum-prefix-length 2 company-require-match nil company-dabbrev-ignore-case
+             nil company-dabbrev-downcase nil company-show-numbers t)
+       :bind
+       ((:company-active-map
+         ("M-n" . nil)
+         ("M-p" . nil)
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))))
+   #+end_src
+
+** Lsp-mode
+   #+begin_src emacs-lisp
+     (straight-use-package 'lsp-mode)
+
+     (leaf lsp-mode
+       :commands lsp)
+   #+end_src
+
+** Flycheck
+   #+begin_src emacs-lisp
+     (straight-use-package 'flycheck)
+
+     (leaf flycheck
+       :hook prog-mode-hook)
+   #+end_src
+
+** Which-key
+   #+begin_src emacs-lisp
+     (straight-use-package 'which-key)
+
+     (leaf which-key
+       :doc "Emacs package that displays available keybindings in popup."
+       :url "https://github.com/justbur/emacs-which-key"
+       :tag "help"
+       :custom (which-key-allow-imprecise-window-fit . nil)
+       :hook 'after-init-hook)
+   #+end_src
+** Org-babel
+   #+begin_src emacs-lisp
+   (custom-set-variables
+      '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
+      '(org-confirm-babel-evaluate nil))
+   #+end_src
+
+** Telega
+   #+begin_src emacs-lisp
+     (straight-use-package 'telega)
+   #+end_src
+
+** Emacs-Rime
+   #+begin_src emacs-lisp
+     (straight-use-package 'rime)
+
+     (leaf rime
+       :bind
+       (:rime-mode-map
+	("C-`"   . rime-send-keybinding)
+	("C-S-`" . rime-send-keybinding)
+	("C-,"   . rime-send-keybinding))
+       (:rime-active-mode-map
+	("C-;"   . rime-send-keybinding)
+	("C-SPC" . rime-send-keybinding))
+       :custom
+       `(rime-emacs-module-header-root    . ,(expand-file-name "/opt/local/include"))
+       `(rime-user-data-dir   . ,(expand-file-name "~/.config/rime"))
+       `(rime-librime-root    . ,(expand-file-name "/opt/local"))
+       (default-input-method  . "rime")
+       (rime-cursor           . "˰")
+       (rime-show-candidate   . 'posframe)
+       (rime-posframe-style   . 'vertical)
+       (rime-show-preedit     . t)
+       (rime-translate-keybindings
+	. '("C-f"
+	    "C-b"
+	    "C-n"
+	    "C-p"
+	    "C-g"
+	    "C-`"
+	    "C-;"
+	    "C-SPC"
+	    "<left>"
+	    "<right>"
+	    "<up>"
+	    "<down>"
+	    "<prior>"
+	    "<next>"
+	    "<delete>")))
+   #+end_src
+** Exec-path-from-shell
+   #+begin_src emacs-lisp
+     (straight-use-package 'exec-path-from-shell)
+     (exec-path-from-shell-initialize)
+   #+end_src
+
+** Org-mode
+   #+begin_src emacs-lisp
+     (leaf org
+       :custom
+       (org-ellipsis . " ﹅")
+       (org-startup-folded    . 'content))
+   #+end_src
+
+** Org-static-blog
+   #+begin_src emacs-lisp
+     (straight-use-package 'org-static-blog)
+
+     (setq org-static-blog-publish-title "Ethereal Horizon")
+     (setq org-static-blog-publish-url "https://keke-cute.github.io/")
+     (setq org-static-blog-publish-directory "~/Repos/keke-cute.github.io")
+     (setq org-static-blog-posts-directory "~/Repos/keke-cute.github.io/posts")
+     (setq org-static-blog-drafts-directory "~/Repos/keke-cute.github.io/drafts")
+     (setq org-static-blog-enable-tags t)
+     (setq org-export-with-toc nil)
+     (setq org-export-with-section-numbers nil)
+
+     ;; This header is inserted into the <head> section of every page:
+     ;;   (you will need to create the style sheet at
+     ;;    ~/projects/blog/static/style.css
+     ;;    and the favicon at
+     ;;    ~/projects/blog/static/favicon.ico)
+     (setq org-static-blog-page-header
+     "<meta name=\"author\" content=\"keke\">
+     <meta name=\"referrer\" content=\"no-referrer\">
+     <link href= \"static/style.css\" rel=\"stylesheet\" type=\"text/css\" />
+     <link rel=\"icon\" href=\"static/favicon.ico\">")
+
+     ;; This preamble is inserted at the beginning of the <body> of every page:
+     ;;   This particular HTML creates a <div> with a simple linked headline
+     (setq org-static-blog-page-preamble
+     "<div class=\"header\">
+       <a href=\"https://keke-cute.github.io\">Ethereal Horizon</a> <A href=\"https://keke-cute.github.io/emacs.html\">Emacs Configure</a>
+     </div>")
+
+     ;; This postamble is inserted at the end of the <body> of every page:
+     ;;   This particular HTML creates a <div> with a link to the archive page
+     ;;   and a licensing stub.
+     (setq org-static-blog-page-postamble
+     "<div id=\"archive\">
+       <a href=\"https://keke-cute.github.io/archive.html\">Other posts</a>
+     </div>
+     <center><a rel=\"license\" href=\"https://creativecommons.org/licenses/by-sa/3.0/\"><img alt=\"Creative Commons License\" style=\"border-width:0\" src=\"https://i.creativecommons.org/l/by-sa/3.0/88x31.png\" /></a><br /><span xmlns:dct=\"https://purl.org/dc/terms/\" href=\"https://purl.org/dc/dcmitype/Text\" property=\"dct:title\" rel=\"dct:type\">Ethereal Horizon</span> by <a xmlns:cc=\"https://creativecommons.org/ns#\" href=\"https://github.com/keke-cute\" property=\"cc:attributionName\" rel=\"cc:attributionURL\">不可视界线</a> is licensed under a <a rel=\"license\" href=\"https://creativecommons.org/licenses/by-sa/3.0/\">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.</center>")
+
+     ;; This HTML code is inserted into the index page between the preamble and
+     ;;   the blog posts
+     (setq org-static-blog-index-front-matter
+     "<h1> Ethereal Horizon </h1>\n")
+   #+end_src
+
+** Org-superstar-mode
+   #+begin_src emacs-lisp
+     (straight-use-package 'org-superstar)
+
+     (leaf org-superstar
+       :hook
+       (org-mode-hook)
+       (nasy/font-change-hook
+	. (lambda ()
+	    (progn
+	      (nasy/set-symbol ?☯ 21 nil)
+	      (nasy/set-symbol ?✿ 18 nil)
+	      (nasy/set-symbol ?❀ 16 nil)
+	      (nasy/set-symbol ?✫ 15 nil)
+	      (nasy/set-symbol ?✸ 16 nil)
+	      (nasy/set-symbol ?◉ 16 nil)
+	      (nasy/set-symbol ?✼ 12 nil)
+	      (nasy/set-symbol ?✚ 12 nil)
+	      (nasy/set-symbol ?⁍ 13 nil)
+	      (nasy/change-char-width ?☯ 2)
+	      (nasy/change-char-width ?✿ 2)
+	      (nasy/change-char-width ?❀ 2)
+	      (nasy/change-char-width ?✫ 2)
+	      (nasy/change-char-width ?✸ 2)
+	      (nasy/change-char-width ?◉ 2)
+	      (nasy/change-char-width ?✼ 1)
+	      (nasy/change-char-width ?✚ 1)
+	      (nasy/change-char-width ?⁍ 1))))
+       :custom
+       ((org-superstar-special-todo-items . t)
+	(org-superstar-headline-bullets-list
+	 . '("☯"
+	     "✿"
+	     "❀"
+	     "✫"
+	     "✸"
+	     "◉"))
+	(org-superstar-item-bullet-alist
+	 . '((?* . ?✼)
+	     (?+ . ?✚)
+	     (?- . ?⁍)))))
+   #+end_src
+
+* 编程语言
+
+** Haskell
+   #+begin_src emacs-lisp
+     (straight-use-package 'haskell-mode)
+
+     (leaf haskell-mode
+       :require t)
+
+     (leaf inf-haskell
+       :require t)
+   #+end_src
+
+** Golang
+   #+begin_src emacs-lisp
+     (straight-use-package 'go-mode)
+
+     (leaf go-mode
+       :hook
+       (go-mode-hook . lsp))
+   #+end_src
