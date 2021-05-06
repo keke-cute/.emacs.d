@@ -38,6 +38,7 @@
     (leaf-keywords-init)
 
     (straight-use-package 'magit)
+    (straight-use-package 'htmlize)
   #+end_src
 
 * 自动加载
@@ -882,6 +883,7 @@
 	 . '((?* . ?✼)
 	     (?+ . ?✚)
 	     (?- . ?⁍)))))
+
    #+end_src
 
 * 编程语言
