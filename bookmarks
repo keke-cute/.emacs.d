@@ -5,6 +5,6 @@
 (("media"
  (filename . "/sshx:192.168.2.3:/mnt/media/")
  (front-context-string . "kpool\n  drwxr-xr")
- (rear-context-string . " 3 May  5 17:39 ")
+ (rear-context-string . " 7 May  5 17:58 ")
  (position . 207))
 )
