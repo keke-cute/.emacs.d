@@ -1,4 +1,0 @@
-* Fix LIBRARY_PATH
-  #+begin_src emacs-lisp
-    (setenv "LIBRARY_PATH" "/opt/local/lib/gcc11")
-  #+end_src
