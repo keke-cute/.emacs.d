@@ -36,8 +36,8 @@
 
   #+begin_src emacs-lisp
     (straight-use-package 'leaf)
-    (straight-use-package 'leaf-keywords)
-    (leaf-keywords-init)
+    ;;(straight-use-package 'leaf-keywords)
+    ;;(leaf-keywords-init)
 
     (straight-use-package 'magit)
     (straight-use-package 'htmlize)
@@ -374,6 +374,8 @@
 
 ** 主题设定
    #+begin_src emacs-lisp
+     (add-to-list 'load-path (expand-file-name "emacs-nasy-theme" user-emacs-directory))
+     (require 'nasy-theme)
      (load-theme 'nasy t)
    #+end_src
 ** 工具栏设定
@@ -480,9 +482,6 @@
       (straight-use-package 'dashboard)
 
       (leaf page-break-lines
-	:doc "Emacs: display ugly ^L page breaks as tidy horizontal lines"
-	:url "https://github.com/purcell/page-break-lines"
-	:tag "convenience" "faces"
 	:hook
 	(after-init-hook . global-page-break-lines-mode)
 	(nasy/font-change-hook
@@ -590,17 +589,11 @@
 		    "Document"
 		    "Document Page"
 		    (lambda (&rest _) (browse-url "https://keke-cute.github.io/emacs.html"))))))))
-	;; :advice)
-	;; (:after dashboard-next-line     nasy/fw2)
-	;; (:after widget-forward          nasy/fw2)
-	;; (:after widget-backward         nasy/fw2))
 
       (setq-default
        initial-scratch-message     (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
        dashboard-banner-logo-title (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
-       ;; initial-buffer-choice       #'(lambda () (get-buffer "*dashboard*"))  ;; It will cause error if you start emacs from Command line with file name
-										;; https://github.com/rakanalh/emacs-dashboard/issues/69
-      )
+       )
     #+end_src
 
 * 编辑器
@@ -665,11 +658,11 @@
 		   (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
 	 :global-minor-mode t))
 
-     (leaf ivy-posframe
-       :hook (ivy-mode-hook)
-       :mode-hook
-       (setq ivy-auto-shrink-minibuffer-alist nil)
-       :global-minor-mode t)
+     ;;(leaf ivy-posframe
+     ;;  :hook (ivy-mode-hook)
+     ;;  :mode-hook
+     ;;  (setq ivy-auto-shrink-minibuffer-alist nil)
+     ;;  :global-minor-mode t)
 
      (leaf all-the-icons-ivy-rich
        :global-minor-mode t)
@@ -739,12 +732,7 @@
       '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
       '(org-confirm-babel-evaluate nil))
    #+end_src
-
-** Telega
-   #+begin_src emacs-lisp
-     (straight-use-package 'telega)
-   #+end_src
-
+   
 ** Emacs-Rime
    #+begin_src emacs-lisp
      (straight-use-package 'rime)
@@ -893,13 +881,13 @@
 
 ** Haskell
    #+begin_src emacs-lisp
-     (straight-use-package 'haskell-mode)
-
-     (leaf haskell-mode
-       :require t)
-
-     (leaf inf-haskell
-       :require t)
+     ;;(straight-use-package 'haskell-mode)
+     ;;
+     ;;(leaf haskell-mode
+     ;;  :require t)
+     ;;
+     ;;(leaf inf-haskell
+     ;;  :require t)
    #+end_src
 
 ** Golang

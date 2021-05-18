@@ -3,7 +3,6 @@ auto-save-list/
 transient/
 .lsp-session-v1
 readme.el
-nasy-theme.el
 .cache/
 recentf
 eshell/
