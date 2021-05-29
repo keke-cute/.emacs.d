@@ -867,7 +867,7 @@
    #+end_src
 ** Telega
    #+begin_src emacs-lisp
-     (straight-use-package 'telega)
+     (straight-use-package '(telega :type git :host github :branch "releases"))
    #+end_src
 ** Htmlize
    #+begin_src emacs-lisp
