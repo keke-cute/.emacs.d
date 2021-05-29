@@ -50,7 +50,14 @@
 	(set-char-table-range table char width)
 	(setq char-width-table table)))
   #+end_src
-* *Font*
+  
+  #+begin_src emacs-lisp
+    ;;;###autoload
+    (defun keke/getgnukstatus ()
+      "output opengpg card message"
+      (shell-command "gpg --card-status"))
+  #+end_src
+* Nasy's Font
   [[https://github.com/nasyxx/emacs.d/tree/master/literate-config/ui]]  
   #+begin_src emacs-lisp
     (defvar nasy/font-change-hook nil
@@ -876,10 +883,6 @@
 ** Hydra
    #+begin_src emacs-lisp
      (straight-use-package 'hydra)
-
-     (defun keke/getgnukstatus ()
-       "output opengpg card message"
-       (shell-command "gpg --card-status"))
 
      (with-eval-after-load 'hydra
        (defhydra keke/main (global-map "<f13>")
