@@ -873,6 +873,33 @@
    #+begin_src emacs-lisp
      (straight-use-package 'htmlize)
    #+end_src
+** Hydra
+   #+begin_src emacs-lisp
+     (straight-use-package 'hydra)
+
+     (defhydra keke/main (global-map "<f12>")
+       "My main hydra keymap"
+       ("g" telega "Telegram")
+       ("m" magit-status "Git Status(Magit)")
+       ("b" counsel-bookmark "My Bookmarks")
+       ("f" counsel-projectile-find-file "Find Current Project File")
+       ("p" counsel-projectile-switch-project "Switch Project")
+       ("t" treemacs "Show Tree Style Files"))
+   #+end_src
+** Treemacs
+   #+begin_src emacs-lisp
+     (straight-use-package 'treemacs)
+
+     (leaf treemacs
+       :bind (("M-O" . treemacs-select-window)))
+   #+end_src
+** Ace-Window
+   #+begin_src emacs-lisp
+     (straight-use-package 'ace-window)
+
+     (leaf ace-window
+       :bind (("M-o" . ace-window)))
+   #+end_src
 * 编程语言
 
 ** Haskell
