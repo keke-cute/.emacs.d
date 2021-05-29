@@ -876,15 +876,21 @@
 ** Hydra
    #+begin_src emacs-lisp
      (straight-use-package 'hydra)
+
+     (defun keke/getgnukstatus ()
+       "output opengpg card message"
+       (shell-command "gpg --card-status"))
+
      (with-eval-after-load 'hydra
-       (defhydra keke/main (global-map "<f12>")
+       (defhydra keke/main (global-map "<f13>")
 	 "My main hydra keymap"
-	 ("a" ansi-term "Terminal")
+	 ("a" eshell "Terminal")
 	 ("g" telega "Telegram")
 	 ("m" magit-status "Git Status(Magit)")
 	 ("b" counsel-bookmark "My Bookmarks")
 	 ("f" counsel-projectile-find-file "Find Current Project File")
 	 ("p" counsel-projectile-switch-project "Switch Project")
+	 ("k" (keke/getgnukstatus) "Gnuk Status")
 	 ("t" treemacs "Show Tree Style Files")))
    #+end_src
 ** Treemacs
