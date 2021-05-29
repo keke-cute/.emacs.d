@@ -884,7 +884,7 @@
    #+begin_src emacs-lisp
      (straight-use-package 'hydra)
 
-     (with-eval-after-load 'hydra
+     (after-x 'hydra
        (defhydra keke/main (global-map "<f13>")
 	 "My main hydra keymap"
 	 ("a" eshell "Terminal")
