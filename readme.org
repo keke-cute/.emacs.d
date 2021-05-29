@@ -5,7 +5,7 @@
 #+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
-* 包管理器与配置包(Straight.el & Leaf)
+* Straight.el & Leaf
   #+begin_src emacs-lisp
     ;;---------------------------------------------------------------------
     ;;(setq comp-deferred-compilation-deny-list ())
@@ -24,17 +24,10 @@
 	  (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
   #+end_src
-
   #+begin_src emacs-lisp
     (straight-use-package 'leaf)
-    ;;(straight-use-package 'leaf-keywords)
-    ;;(leaf-keywords-init)
-
-    (straight-use-package 'magit)
-    (straight-use-package 'htmlize)
   #+end_src
-
-* 自动加载
+* Autoload
   [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-libs.org]]
   #+begin_src emacs-lisp
     ;;;###autoload
@@ -57,8 +50,8 @@
 	(set-char-table-range table char width)
 	(setq char-width-table table)))
   #+end_src
-
-  [[https://github.com/nasyxx/emacs.d/tree/master/literate-config/ui]]
+* *Font*
+  [[https://github.com/nasyxx/emacs.d/tree/master/literate-config/ui]]  
   #+begin_src emacs-lisp
     (defvar nasy/font-change-hook nil
       "Hooks to run after font changed.")
@@ -868,6 +861,18 @@
 
    #+end_src
 
+** Magit
+   #+begin_src emacs-lisp
+     (straight-use-package 'magit)
+   #+end_src
+** Telega
+   #+begin_src emacs-lisp
+     (straight-use-package 'telega)
+   #+end_src
+** Htmlize
+   #+begin_src emacs-lisp
+     (straight-use-package 'htmlize)
+   #+end_src
 * 编程语言
 
 ** Haskell
@@ -892,4 +897,9 @@
 ** Nix
    #+begin_src emacs-lisp
      (straight-use-package 'nix-mode)
+   #+end_src
+
+** Yaml
+   #+begin_src emacs-lisp
+     (straight-use-package 'yaml-mode)
    #+end_src
