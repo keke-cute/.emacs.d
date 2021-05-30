@@ -914,7 +914,8 @@
 	 ("f" counsel-projectile-find-file "Find Current Project File")
 	 ("p" counsel-projectile-switch-project "Switch Project")
 	 ("k" (keke/getgnukstatus) "Gnuk Status")
-	 ("t" treemacs "Show Tree Style Files")))
+	 ("t" treemacs "Treemacs")
+	 ("T" treemacs-display-current-project-exclusively "Current Project in Treemacs")))
    #+end_src
 ** Treemacs
    #+begin_src emacs-lisp
