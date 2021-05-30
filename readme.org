@@ -868,6 +868,26 @@
 
    #+end_src
 
+** Org-Roam
+   #+begin_src emacs-lisp
+     (straight-use-package 'org-roam)
+
+     (leaf org-roam
+       :doc "Rudimentary Roam replica with org-mode."
+       :url "https://github.com/org-roam/org-roam"
+       :tag "convenience" "roam"
+       :hook (org-mode-hook)
+       :custom
+       `(org-roam-directory . ,(expand-file-name "~/Repos/roam"))
+       :bind
+       (:org-roam-mode-map
+	(("C-c n l" . org-roam)
+	 ("C-c n f" . org-roam-find-file)
+	 ("C-c n g" . org-roam-graph)))
+       (:org-mode-map
+	(("C-c n i" . org-roam-insert))
+	(("C-c n I" . org-roam-insert-immediate))))
+   #+end_src
 ** Magit
    #+begin_src emacs-lisp
      (straight-use-package 'magit)
@@ -909,7 +929,7 @@
 
      (leaf ace-window
        :bind (("M-o" . ace-window)))
-   #+end_src
+   #+end_src   
 * 编程语言
 
 ** Haskell
