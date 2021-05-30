@@ -779,7 +779,7 @@
 
 ** Org-static-blog
    #+begin_src emacs-lisp
-     (straight-use-package 'org-static-blog)
+;;     (straight-use-package 'org-static-blog)
 
      (setq org-static-blog-publish-title "Ethereal Horizon")
      (setq org-static-blog-publish-url "https://keke-cute.github.io/")
