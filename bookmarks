@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("poorpool"
+(("org-capture-last-stored"
+ (filename . "~/Repos/roam/20210610171552-readme.org")
+ (front-context-string . "\n* Readme\n  This")
+ (rear-context-string . "#+title: readme\n")
+ (position . 84))
+("poorpool"
  (filename . "/Volumes/poorpool/")
  (front-context-string . "adult\n  drwxr-xr")
  (rear-context-string . "84 May 29 13:55 ")

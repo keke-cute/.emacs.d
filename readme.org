@@ -870,23 +870,20 @@
 
 ** Org-Roam
    #+begin_src emacs-lisp
-     (straight-use-package 'org-roam)
+     (straight-use-package '(org-roam :type git :host github :branch "v2"))
 
      (leaf org-roam
-       :doc "Rudimentary Roam replica with org-mode."
-       :url "https://github.com/org-roam/org-roam"
-       :tag "convenience" "roam"
-       :hook (org-mode-hook)
+       :hook
+       (after-init . org-roam-mode)
+       :commands
+       (org-roam-buffer
+	org-roam-setup
+	org-roam-capture
+	org-roam-node-find)
        :custom
        `(org-roam-directory . ,(expand-file-name "~/Repos/roam"))
-       :bind
-       (:org-roam-mode-map
-	(("C-c n l" . org-roam)
-	 ("C-c n f" . org-roam-find-file)
-	 ("C-c n g" . org-roam-graph)))
-       (:org-mode-map
-	(("C-c n i" . org-roam-insert))
-	(("C-c n I" . org-roam-insert-immediate))))
+       :config
+       (org-roam-setup))
    #+end_src
 ** Magit
    #+begin_src emacs-lisp
@@ -910,6 +907,7 @@
 	 ("a" eshell "Terminal")
 	 ("g" telega "Telegram")
 	 ("m" magit-status "Git Status(Magit)")
+	 ("r" org-roam-node-find "Find Org-roam node")
 	 ("b" counsel-bookmark "My Bookmarks")
 	 ("f" counsel-projectile-find-file "Find Current Project File")
 	 ("p" counsel-projectile-switch-project "Switch Project")
