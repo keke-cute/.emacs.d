@@ -14,3 +14,5 @@ eln-cache/
 .DS_Store
 early-init.el
 org-roam.db
+timestamps/
+init.el

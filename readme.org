@@ -5,8 +5,16 @@
 #+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
+#+PROPERTY: header-args:elisp :tangle (concat temporary-file-directory "init.el")
+
+* File Header                                            :noexport:
+
+#+begin_src elisp
+  ;;; early-init.el -*- lexical-binding: t; -*-
+#+end_src
+
 * Straight.el & Leaf
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     ;;---------------------------------------------------------------------
     ;;(setq comp-deferred-compilation-deny-list ())
     ;;(setq native-comp-async-jobs-number 8)
@@ -24,12 +32,12 @@
 	  (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
   #+end_src
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     (straight-use-package 'leaf)
   #+end_src
 * Autoload
   [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-libs.org]]
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     ;;;###autoload
     (if (fboundp 'with-eval-after-load)
 	(defalias 'after-x 'with-eval-after-load)
@@ -41,7 +49,7 @@
   #+end_src
 
   [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-text.org]]
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     ;;;###autoload
     (defun nasy/change-char-width (char width)
       "Change CHAR width to WIDTH."
@@ -51,7 +59,7 @@
 	(setq char-width-table table)))
   #+end_src
   
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     ;;;###autoload
     (defun keke/getgnukstatus ()
       "output opengpg card message"
@@ -59,7 +67,7 @@
   #+end_src
 * Nasy's Font
   [[https://github.com/nasyxx/emacs.d/tree/master/literate-config/ui]]  
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     (defvar nasy/font-change-hook nil
       "Hooks to run after font changed.")
 
@@ -232,7 +240,7 @@
     (add-hook #'server-after-make-frame-hook #'nasy/set-font)
   #+end_src
 * 检测系统
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     (defconst *is-a-mac* (eq system-type 'darwin))
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
 
@@ -258,7 +266,7 @@
 
 * 界面
 ** 主要的一些设定
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (setq inhibit-splash-screen t)
      (when (graphic-p)
        ;; default frame size
@@ -271,7 +279,7 @@
    #+end_src
 
 ** 指定模式禁用行号
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      ;; (defun my-inhibit-global-linum-mode ()
      ;;   "Counter-act `global-linum-mode'."
      ;;   (add-hook 'after-change-major-mode-hook
@@ -289,7 +297,7 @@
    #+end_src
 
 ** 字体设定
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf nasy-font
        :doc "一些默訒値。"
        :custom
@@ -344,7 +352,7 @@
    #+end_src
 
 ** 设定macOS上的窗口样式
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf mac-frame
        :when *is-a-mac*
        :config
@@ -364,13 +372,13 @@
    #+end_src
 
 ** 主题设定
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (add-to-list 'load-path (expand-file-name "emacs-nasy-theme" user-emacs-directory))
      (require 'nasy-theme)
      (load-theme 'nasy t)
    #+end_src
 ** 工具栏设定
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf tool-bar
        :tag "builtin"
        :bind
@@ -391,7 +399,7 @@
 
 ** 一些关于界面的插件
 *** 彩虹括号
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (straight-use-package 'rainbow-delimiters)
 
       (leaf rainbow-delimiters
@@ -413,7 +421,7 @@
     #+end_src
 
 *** 彩虹猫
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (straight-use-package 'nyan-mode)
       (leaf nyan-mode
 	:custom (nyan-animate-nyancat . t)
@@ -424,7 +432,7 @@
     #+end_src
 
 *** 对齐线
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (when (graphic-p)
 	(straight-use-package 'highlight-indent-guides)
 
@@ -434,7 +442,7 @@
 	  (setq highlight-indent-guides-method 'bitmap)))
     #+end_src
 *** Doom-modeline
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (straight-use-package 'doom-modeline)
 
       (leaf doom-modeline
@@ -451,7 +459,7 @@
     #+end_src
 
 *** Doom-Themes
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (straight-use-package 'doom-themes)
 
       (leaf doom-themes
@@ -469,7 +477,7 @@
     #+end_src    
 
 *** Dashboard
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (straight-use-package 'dashboard)
 
       (leaf page-break-lines
@@ -588,7 +596,7 @@
     #+end_src
 
 * 编辑器
-  #+begin_src emacs-lisp
+  #+begin_src elisp
     ;; 自动加载外部修改过的文件
     (global-auto-revert-mode 1)
     ;; 关闭自己生产的保存文件
@@ -610,7 +618,7 @@
 * 包
 
 ** Ivy
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'ivy)
      (straight-use-package 'swiper)
      (straight-use-package 'counsel)
@@ -663,7 +671,7 @@
    #+end_src
 
 ** Projectile
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'projectile)
 
      (leaf projectile
@@ -672,7 +680,7 @@
 
    #+end_src
 ** Company
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'company)
 
      (leaf company
@@ -691,7 +699,7 @@
    #+end_src
 
 ** Lsp-mode
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'lsp-mode)
 
      (leaf lsp-mode
@@ -699,7 +707,7 @@
    #+end_src
 
 ** Flycheck
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'flycheck)
 
      (leaf flycheck
@@ -707,7 +715,7 @@
    #+end_src
 
 ** Which-key
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'which-key)
 
      (leaf which-key
@@ -718,14 +726,14 @@
        :hook 'after-init-hook)
    #+end_src
 ** Org-babel
-   #+begin_src emacs-lisp
+   #+begin_src elisp
    (custom-set-variables
       '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
       '(org-confirm-babel-evaluate nil))
    #+end_src
    
 ** Emacs-Rime
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'rime)
 
      (leaf rime
@@ -764,13 +772,13 @@
 	    "<delete>")))
    #+end_src
 ** Exec-path-from-shell
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'exec-path-from-shell)
      (exec-path-from-shell-initialize)
    #+end_src
 
 ** Org-mode
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf org
        :custom
        (org-ellipsis . " ﹅")
@@ -778,7 +786,7 @@
    #+end_src
 
 ** Org-static-blog
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'org-static-blog)
 
      (setq org-static-blog-publish-title "Ethereal Horizon")
@@ -824,7 +832,7 @@
    #+end_src
 
 ** Org-superstar-mode
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'org-superstar)
 
      (leaf org-superstar
@@ -869,7 +877,7 @@
    #+end_src
 
 ** Org-Roam
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package '(org-roam :type git :host github :branch "v2"))
 
      (leaf org-roam
@@ -885,19 +893,19 @@
        (org-roam-setup))
    #+end_src
 ** Magit
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'magit)
    #+end_src
 ** Telega
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package '(telega :type git :host github :branch "releases"))
    #+end_src
 ** Htmlize
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'htmlize)
    #+end_src
 ** Hydra
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'hydra)
 
      (after-x 'hydra
@@ -916,14 +924,14 @@
 	 ("T" treemacs-display-current-project-exclusively "Current Project in Treemacs")))
    #+end_src
 ** Treemacs
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'treemacs)
 
      (leaf treemacs
        :bind (("M-O" . treemacs-select-window)))
    #+end_src
 ** Ace-Window
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'ace-window)
 
      (leaf ace-window
@@ -931,7 +939,7 @@
    #+end_src   
 ** Dired-hacks
    [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/editor/dired.org]]
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'dired-hacks)
      (leaf dired-hacks
        :doc "Collection of useful dired additions"
@@ -939,7 +947,7 @@
        :tag "files")
    #+end_src
    Dired Filter:
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf dired-filter
        :tag "files"
        :bind
@@ -979,7 +987,7 @@
 	      (extension "jpg" "JPG" "webp" "png" "PNG" "jpeg" "JPEG" "bmp" "BMP" "TIFF" "tiff" "gif" "GIF"))))))
    #+end_src
    Dired Rainbow:
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf dired-rainbow
        :tag "files"
        :commands dired
@@ -1026,7 +1034,7 @@
 
    #+end_src
    Dired Narrow:
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf dired-narrow
        :tag "files"
        :bind ((:dired-narrow-map
@@ -1035,7 +1043,7 @@
 	       ("<right>" . dired-narrow-enter-directory))))
    #+end_src
    Dired Collapse:
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (leaf dired-collapse
        :tag "files"
        :hook dired-mode-hook)
@@ -1043,7 +1051,7 @@
 * 编程语言
 
 ** Haskell
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      ;;(straight-use-package 'haskell-mode)
      ;;
      ;;(leaf haskell-mode
@@ -1054,7 +1062,7 @@
    #+end_src
 
 ** Golang
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'go-mode)
 
      (leaf go-mode
@@ -1062,11 +1070,11 @@
        (go-mode-hook . lsp))
    #+end_src
 ** Nix
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'nix-mode)
    #+end_src
 
 ** Yaml
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (straight-use-package 'yaml-mode)
    #+end_src
