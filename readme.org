@@ -15,10 +15,6 @@
 
 * Straight.el & Leaf
   #+begin_src elisp
-    ;;---------------------------------------------------------------------
-    ;;(setq comp-deferred-compilation-deny-list ())
-    ;;(setq native-comp-async-jobs-number 8)
-    ;;---------------------------------------------------------------------
     (defvar bootstrap-version)
     (let ((bootstrap-file
 	   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -780,6 +776,8 @@
 ** Org-mode
    #+begin_src elisp
      (leaf org
+       :config
+       (setq org-startup-indented t)
        :custom
        (org-ellipsis . " ﹅")
        (org-startup-folded    . 'content))
