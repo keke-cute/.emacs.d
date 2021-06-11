@@ -10,7 +10,7 @@
 * File Header                                            :noexport:
 
 #+begin_src elisp
-  ;;; early-init.el -*- lexical-binding: t; -*-
+  ;;; init.el -*- lexical-binding: t; -*-
 #+end_src
 
 * Straight.el & Leaf
