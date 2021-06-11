@@ -3,10 +3,10 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
- (filename . "~/Repos/roam/20210610171552-readme.org")
- (front-context-string . "\n* Readme\n  This")
- (rear-context-string . "#+title: readme\n")
- (position . 84))
+ (filename . "~/Repos/roam/20210610193135-qbittorrent_in_docker.org")
+ (front-context-string)
+ (rear-context-string . "rrent in Docker\n")
+ (position . 99))
 ("poorpool"
  (filename . "/Volumes/poorpool/")
  (front-context-string . "adult\n  drwxr-xr")

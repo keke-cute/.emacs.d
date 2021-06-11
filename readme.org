@@ -873,8 +873,7 @@
      (straight-use-package '(org-roam :type git :host github :branch "v2"))
 
      (leaf org-roam
-       :hook
-       (after-init . org-roam-mode)
+       :after org
        :commands
        (org-roam-buffer
 	org-roam-setup
@@ -908,6 +907,7 @@
 	 ("g" telega "Telegram")
 	 ("m" magit-status "Git Status(Magit)")
 	 ("r" org-roam-node-find "Find Org-roam node")
+	 ("i" org-roam-node-insert "Insert Org-roam file")
 	 ("b" counsel-bookmark "My Bookmarks")
 	 ("f" counsel-projectile-find-file "Find Current Project File")
 	 ("p" counsel-projectile-switch-project "Switch Project")
