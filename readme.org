@@ -477,6 +477,7 @@
   (straight-use-package 'centaur-tabs)
   
   (leaf centaur-tabs
+    :leaf-defer nil
     :custom
     ((centaur-tabs-show-navigation-buttons . t)
      (centaur-tabs-set-icons . t)
