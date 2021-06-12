@@ -472,6 +472,19 @@
 	  (doom-themes-org-config)))
     #+end_src    
 
+*** Centaur-tabs
+#+begin_src elisp
+  (straight-use-package 'centaur-tabs)
+  
+  (leaf centaur-tabs
+    :leaf-defer nil
+    :config
+    (centaur-tabs-mode t)
+    (setq centaur-tabs-show-navigation-buttons t)
+    (setq centaur-tabs-plain-icons t)
+    (setq centaur-tabs-set-icons t))
+#+end_src
+
 *** Dashboard
     #+begin_src elisp
       (straight-use-package 'dashboard)
@@ -905,21 +918,23 @@
 ** Hydra
    #+begin_src elisp
      (straight-use-package 'hydra)
-
+     
      (after-x 'hydra
        (defhydra keke/main (global-map "<f13>")
-	 "My main hydra keymap"
-	 ("a" eshell "Terminal")
-	 ("g" telega "Telegram")
-	 ("m" magit-status "Git Status(Magit)")
-	 ("r" org-roam-node-find "Find Org-roam node")
-	 ("i" org-roam-node-insert "Insert Org-roam file")
-	 ("b" counsel-bookmark "My Bookmarks")
-	 ("f" counsel-projectile-find-file "Find Current Project File")
-	 ("p" counsel-projectile-switch-project "Switch Project")
-	 ("k" (keke/getgnukstatus) "Gnuk Status")
-	 ("t" treemacs "Treemacs")
-	 ("T" treemacs-display-current-project-exclusively "Current Project in Treemacs")))
+         "My main hydra keymap"
+         ("a" eshell "Terminal")
+         ("g" telega "Telegram")
+         ("m" magit-status "Git Status(Magit)")
+         ("r" org-roam-node-find "Find Org-roam node")
+         ("i" org-roam-node-insert "Insert Org-roam file")
+         ("b" counsel-bookmark "My Bookmarks")
+         ("f" counsel-projectile-find-file "Find Current Project File")
+         ("p" counsel-projectile-switch-project "Switch Project")
+         ("k" (keke/getgnukstatus) "Gnuk Status")
+         ("t" treemacs "Treemacs")
+         ("," centaur-tabs-backward "Next Tabs")
+         ("." centaur-tabs-forward "Up Tabs")
+         ("T" treemacs-display-current-project-exclusively "Current Project in Treemacs")))
    #+end_src
 ** Treemacs
    #+begin_src elisp
