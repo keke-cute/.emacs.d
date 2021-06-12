@@ -477,12 +477,14 @@
   (straight-use-package 'centaur-tabs)
   
   (leaf centaur-tabs
-    :leaf-defer nil
+    :custom
+    ((centaur-tabs-show-navigation-buttons . t)
+     (centaur-tabs-set-icons . t)
+     (centaur-tabs-style . 'wave)
+     (centaur-tabs-set-modified-marker . t)
+     (centaur-tabs-modified-marker . "✰"))
     :config
-    (centaur-tabs-mode t)
-    (setq centaur-tabs-show-navigation-buttons t)
-    (setq centaur-tabs-plain-icons t)
-    (setq centaur-tabs-set-icons t))
+    (centaur-tabs-mode t))
 #+end_src
 
 *** Dashboard
