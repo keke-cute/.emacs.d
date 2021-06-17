@@ -3,10 +3,10 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
- (filename . "~/Repos/roam/20210610193135-qbittorrent_in_docker.org")
+ (filename . "~/Repos/roam/20210617153046-mit_6_824.org")
  (front-context-string)
- (rear-context-string . "rrent in Docker\n")
- (position . 99))
+ (rear-context-string . "itle: MIT 6.824\n")
+ (position . 87))
 ("poorpool"
  (filename . "/Volumes/poorpool/")
  (front-context-string . "adult\n  drwxr-xr")
