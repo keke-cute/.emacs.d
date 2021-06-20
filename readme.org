@@ -491,11 +491,6 @@
 *** Dashboard
 [[https://github.com/nasyxx/emacs.d/blob/master/%E8%94%93%E8%89%B8/%E5%BA%AD%E5%B0%9E/%E7%AF%87.org]]
     #+begin_src elisp
-      (leaf dashboard
-        :commands (dashboard-refresh-buffer
-                   dashboard-setup-startup-hook)
-        :init (straight-use-package 'dashboard))
-      
       (leaf page-break-lines
         :hook
         (after-init-hook . global-page-break-lines-mode)
@@ -506,6 +501,11 @@
                (nasy/set-symbol ?⊸ 18 nil))))
         :custom
         (page-break-lines-char . ?⊸))
+      
+      (leaf dashboard
+        :commands (dashboard-refresh-buffer
+                   dashboard-setup-startup-hook)
+        :init (straight-use-package 'dashboard))
       
       (defun nasy/-set-dashboard-init-info (&rest _)
         (setq dashboard-init-info
@@ -575,7 +575,8 @@
         ((dashboard-center-content
           dashboard-set-heading-icons
           dashboard-set-init-info) . t)
-        `(dashboard-startup-banner       . ,(expand-file-name "n_icon.png" user-emacs-directory))
+        `(dashboard-startup-banner
+          . ,(expand-file-name "n_icon.png" user-emacs-directory))
         :advice (:before dashboard-refresh-buffer nasy/-set-dashboard-init-info))
       
       (setq-default
