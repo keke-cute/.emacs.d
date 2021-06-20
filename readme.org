@@ -687,59 +687,25 @@
 
 * 包
 
-** Ivy
-   #+begin_src elisp
-     (straight-use-package 'ivy)
-     (straight-use-package 'swiper)
-     (straight-use-package 'counsel)
-     (straight-use-package 'counsel-projectile)
-     (straight-use-package 'ivy-posframe)
-     (straight-use-package 'all-the-icons-ivy-rich)
+** Selectrum
+#+begin_src elisp
+  (leaf selectrum
+    :config (selectrum-mode +1)
+    :init (straight-use-package 'selectrum))
+#+end_src
 
-     (leaf ivy
-       :doc "Incremental Vertical completYon"
-       :req "emacs-24.5"
-       :tag "matching" "emacs>=24.5"
-       :url "https://github.com/abo-abo/swiper"
-       :emacs>= 24.5
-       :leaf-defer nil
-       :custom ((ivy-initial-inputs-alist . nil)
-		(ivy-use-selectable-prompt . t))
-       :global-minor-mode t
-       :config
-       (leaf swiper
-	 :doc "Isearch with an overview. Oh, man!"
-	 :req "emacs-24.5" "ivy-0.13.0"
-	 :tag "matching" "emacs>=24.5"
-	 :url "https://github.com/abo-abo/swiper"
-	 :emacs>= 24.5
-	 :bind (("C-s" . swiper)))
+** Consult
+#+begin_src elisp
+  (leaf consult
+    :init (straight-use-package 'consult))
+#+end_src
 
-       (leaf counsel
-	 :doc "Various completion functions using Ivy"
-	 :req "emacs-24.5" "swiper-0.13.0"
-	 :tag "tools" "matching" "convenience" "emacs>=24.5"
-	 :url "https://github.com/abo-abo/swiper"
-	 :emacs>= 24.5
-	 :bind (("C-S-s" . counsel-imenu)
-		("C-x C-r" . counsel-recentf))
-	 :custom `((counsel-yank-pop-separator . "\n----------\n")
-		   (counsel-find-file-ignore-regexp . ,(rx-to-string '(or "./" "../") 'no-group)))
-	 :global-minor-mode t))
-
-     ;;(leaf ivy-posframe
-     ;;  :hook (ivy-mode-hook)
-     ;;  :mode-hook
-     ;;  (setq ivy-auto-shrink-minibuffer-alist nil)
-     ;;  :global-minor-mode t)
-
-     (leaf all-the-icons-ivy-rich
-       :global-minor-mode t)
-
-     (leaf ivy-rich
-       :global-minor-mode t)
-   #+end_src
-
+** Orderless
+#+begin_src elisp
+  (leaf orderless
+    :custom (completion-styles . '(orderless))
+    :init (straight-use-package 'orderless))
+#+end_src
 ** Projectile
    #+begin_src elisp
      (straight-use-package 'projectile)
@@ -988,9 +954,9 @@
          ("m" magit-status "Git Status(Magit)")
          ("r" org-roam-node-find "Find Org-roam node")
          ("i" org-roam-node-insert "Insert Org-roam file")
-         ("b" counsel-bookmark "My Bookmarks")
-         ("f" counsel-projectile-find-file "Find Current Project File")
-         ("p" counsel-projectile-switch-project "Switch Project")
+         ("b" consult-bookmark "My Bookmarks")
+         ("f" projectile-find-file "Find Current Project File")
+         ("p" projectile-switch-project "Switch Project")
          ("k" (keke/getgnukstatus) "Gnuk Status")
          ("t" treemacs "Treemacs")
          ("," centaur-tabs-backward "Next Tabs")
