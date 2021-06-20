@@ -689,14 +689,9 @@
 
 ** Selectrum
 #+begin_src elisp
-  (leaf selectrum-prescient
-    :init (straight-use-package 'selectrum-prescient))
-  
   (leaf selectrum
     :config
     (selectrum-mode +1)
-    (selectrum-prescient-mode +1)
-    (prescient-persist-mode +1)
     :init (straight-use-package 'selectrum))
 #+end_src
 
@@ -710,6 +705,7 @@
 #+begin_src elisp
   (leaf orderless
     :custom (completion-styles . '(orderless))
+    :config (savehist-mode)
     :init (straight-use-package 'orderless))
 #+end_src
 ** Projectile
