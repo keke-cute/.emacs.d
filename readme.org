@@ -515,7 +515,6 @@
                     (format "Emacs started in %s" time)
                   (format "%d packages loaded in %s" package-count time)))))
       
-      
       (defun nasy/-dashboard-items (_)
         (insert "\n")
         (widget-create 'item
@@ -547,67 +546,7 @@
                        :button-suffix ""
                        :format "%[%t%]"
                        :help-echo "open projects")
-        (insert "               \n\n")
-        (widget-create 'item
-                       :tag "草稿 (c)"
-                       :action #'persistent-scratch-restore
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "📝 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "restore scratch buffer")
-        (insert "\t")
-        (widget-create 'item
-                       :tag "議程 (a)"
-                       :action #'org-agenda
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "🗓 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "Org Agenda")
-        (insert "\t")
-        (widget-create 'item
-                       :tag "日曆 (d)"
-                       :action #'calendar
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "📅 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "open calendar")
-        (insert "               \n\n")
-        (widget-create 'item
-                       :tag "芄蘭 (C)"
-                       :action #'nasy/-open-custom
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "⚙ "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "open custom file")
-        (insert "\t")
-        (widget-create 'item
-                       :tag "源碼 (s)"
-                       :action #'nasy/-open-source-page
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "🍭 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "open https://github.com/nasyxx/emacs.d/")
-        (insert "\t")
-        (widget-create 'item
-                       :tag "文檔 (D)"
-                       :action #'nasy/-open-document
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "📖 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "open https://emacs.nasy.moe")
-        (insert "               \n\n"))
+        (insert "               \n"))
       
       
       (after-x 'dashboard
@@ -625,33 +564,13 @@
         (:dashboard-mode-map
          ("r"              . consult-recent-file)
          ("b"              . consult-bookmark)
-         ("p"              . projectile-switch-project)
-         ("c"              . persistent-scratch-restore)
-         ("a"              . org-agenda)
-         ("d"              . calendar)
-         ("C"              . nasy/-open-custom)
-         ("s"              . nasy/-open-source-page)
-         ("D"              . nasy/-open-document)
-         ("g"              . dashboard-refresh-buffer)
-         ("<down-mouse-1>" . nil)
-         ("H-p"            . dashboard-previous-line)
-         ("H-n"            . dashboard-next-line)
-         ("H-b"            . widget-backward)
-         ("H-f"            . widget-forward)
-         ("<mouse-1>"      . widget-button-click)
-         ("<mouse-2>"      . widget-button-click)
-         ("<up>"           . widget-backward)
-         ("<down>"         . nasy/wfw1))
+         ("p"              . projectile-switch-project))
         :hook
         ((dashboard-mode-hook . (lambda () (setq-local tab-width 1)))
          (after-init-hook     . dashboard-setup-startup-hook)
          (after-init-hook     . dashboard-refresh-buffer))
         :custom
         (dashboard-items . '((n-items . t)))
-                             ;; (bookmarks . t)))
-                             ;; (registers . 5)
-                             ;; (agenda    . 5)
-                             ;; (projects  . 7)))
         (dashboard-item-generators . '((n-items . nasy/-dashboard-items)))
         ((dashboard-center-content
           dashboard-set-heading-icons
