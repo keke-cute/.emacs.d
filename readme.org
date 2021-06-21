@@ -12,9 +12,9 @@
   ;;; init.el -*- lexical-binding: t; -*-
 #+end_src
 * 预览
-[[https://raw.githubusercontent.com/keke-cute/.emacs.d/master/ScreenShot-1.png]]
+[[./ScreenShot-1.png]]
 
-[[https://raw.githubusercontent.com/keke-cute/.emacs.d/master/ScreenShot-2.png]]
+[[./ScreenShot-2.png]]
 * 使用
 #+begin_src shell
   mv ~/.emacs.d ~/.emacs.d.backup
