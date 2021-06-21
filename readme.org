@@ -655,37 +655,18 @@
        (setq org-static-blog-use-preview t)
        (setq org-export-with-toc nil)
        (setq org-export-with-section-numbers nil)
-     
-       ;; This header is inserted into the <head> section of every page:
-       ;;   (you will need to create the style sheet at
-       ;;    ~/projects/blog/static/style.css
-       ;;    and the favicon at
-       ;;    ~/projects/blog/static/favicon.ico)
        (setq org-static-blog-page-header
              "<meta name=\"author\" content=\"keke\">
      <meta name=\"referrer\" content=\"no-referrer\">
      <link href= \"static/blog.css\" rel=\"stylesheet\" type=\"text/css\" />
      <link rel=\"icon\" href=\"static/favicon.ico\">")
-     
-       ;; This preamble is inserted at the beginning of the <body> of every page:
-       ;;   This particular HTML creates a <div> with a simple linked headline
-       (setq org-static-blog-page-preamble
-             "<div class=\"header\">
-       <a href=\"https://keke-cute.github.io\">Ethereal Horizon</a> <A href=\"https://keke-cute.github.io/emacs.html\">Emacs Configure</a>
-     </div>")
-     
-       ;; This postamble is inserted at the end of the <body> of every page:
-       ;;   This particular HTML creates a <div> with a link to the archive page
-       ;;   and a licensing stub.
-       ;;(setq org-static-blog-page-postamble
-       ;;      "<center>By Keke</center>")
-     
-       ;; This HTML code is inserted into the index page between the preamble and
-       ;;   the blog posts
        (setq org-static-blog-index-front-matter
              "<h1> Ethereal Horizon </h1>\n")
+       (setq org-static-blog-page-preamble
+             "<div class=\"header\">
+       <a href=\"https://keke-cute.github.io\">Home</a>  <A href=\"https://keke-cute.github.io/emacs.html\">Emacs</a>
+     </div>")
        :init (straight-use-package 'org-static-blog))
-     
    #+end_src
 
 ** Org-superstar-mode
