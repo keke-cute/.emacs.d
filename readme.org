@@ -11,7 +11,17 @@
 #+begin_src emacs-lisp
   ;;; init.el -*- lexical-binding: t; -*-
 #+end_src
-
+* 预览
+[[./ScreenShot-1.png]]
+[[./ScreenShot-2.png]]
+* 使用
+#+begin_src shell
+  mv ~/.emacs.d ~/.emacs.d.backup
+  git clone https://github.com/keke-cute/.emacs.d ~/.emacs.d
+  cd ~/.emacs.d
+  git submodule update --init
+  make
+#+end_src
 * Straight.el & Leaf
   #+begin_src emacs-lisp
     (defvar bootstrap-version)
