@@ -5,16 +5,15 @@
 #+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
-#+PROPERTY: header-args:elisp :tangle (concat temporary-file-directory "init.el")
-
+#+PROPERTY: header-args:emacs-lisp :tangle (concat temporary-file-directory "init.el") :lexical t
 * File Header                                            :noexport:
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   ;;; init.el -*- lexical-binding: t; -*-
 #+end_src
 
 * Straight.el & Leaf
-  #+begin_src elisp
+  #+begin_src emacs-lisp
     (defvar bootstrap-version)
     (let ((bootstrap-file
 	   (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -28,41 +27,37 @@
 	  (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
   #+end_src
-  #+begin_src elisp
+  #+begin_src emacs-lisp
     (straight-use-package 'leaf)
   #+end_src
-* Autoload
-  [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-libs.org]]
-  #+begin_src elisp
-    ;;;###autoload
-    (if (fboundp 'with-eval-after-load)
-	(defalias 'after-x 'with-eval-after-load)
-      (defmacro after-x (feature &rest body)
-	"Eval BODY afetr FEATURE have loaded."
-	(declare (indent defun))
-	`(eval-after-load ,feature
-	   '(progn ,@body))))
+* 宏和函数
+[[https://github.com/nasyxx/emacs.d/blob/master/%E8%94%93%E8%89%B8/%E9%A2%A8%E9%9B%A8/%E7%AF%87.org][蔓艸/風雨/篇.org]]
+  #+begin_src emacs-lisp
+    (cl-eval-when (compile eval load)
+      (if (fboundp 'with-eval-after-load)
+          (defalias 'after-x 'with-eval-after-load)
+        (defmacro after-x (feature &rest body)
+          "Eval BODY afetr FEATURE have loaded."
+          (declare (indent defun))
+          `(eval-after-load ,feature
+             '(progn ,@body)))))
   #+end_src
-
-  [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/core/core-text.org]]
-  #+begin_src elisp
-    ;;;###autoload
+  #+begin_src emacs-lisp
     (defun nasy/change-char-width (char width)
       "Change CHAR width to WIDTH."
       (let ((table (make-char-table nil)))
-	(set-char-table-parent table char-width-table)
-	(set-char-table-range table char width)
-	(setq char-width-table table)))
+        (set-char-table-parent table char-width-table)
+        (set-char-table-range table char width)
+        (setq char-width-table table)))
   #+end_src
-  
-  #+begin_src elisp
-    ;;;###autoload
+  Myself
+  #+begin_src emacs-lisp
     (defun keke/getgnukstatus ()
       "output opengpg card message"
       (shell-command "gpg --card-status"))
   #+end_src
 * 检测系统
-  #+begin_src elisp
+  #+begin_src emacs-lisp
     (defconst *is-a-mac* (eq system-type 'darwin))
     (defconst *is-a-linux* (eq system-type 'gnu/linux))
 
@@ -88,7 +83,7 @@
 
 * 界面
 ** 主要的一些设定
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      ;;(setq inhibit-splash-screen t)
      (when (graphic-p)
        ;; default frame size
@@ -102,7 +97,7 @@
 
 ** 字体设定
 [[https://github.com/nasyxx/emacs.d/blob/master/%E8%94%93%E8%89%B8/%E9%A2%A8%E9%9B%A8/%E7%AF%87.org][蔓艸/風雨/篇.org]]
-#+begin_src elisp
+#+begin_src emacs-lisp
   (defvar nasy/font-change-hook nil
     "Hooks to run after font changed.")
   
@@ -123,10 +118,10 @@
       (dolist (cname '("main" "symbol" "cjk" "mode-line" "tab-line" "header-line"))
         (cl-loop for ftype in '("family" "weight" "size" "scale")
                  for type = (cond ((string= "family" ftype) 'string)
-                                ((string= "weight" ftype) 'symbol)
-                                ((string= "size" ftype)   'float)
-                                ((string= "scale" ftype)  'float)
-                                (t (error "Wrong Font Type")))
+                                  ((string= "weight" ftype) 'symbol)
+                                  ((string= "size" ftype)   'float)
+                                  ((string= "scale" ftype)  'float)
+                                  (t (error "Wrong Font Type")))
                  for doc  = (nasy/-font-doc cname ftype)
                  for name = (intern (format "*font-%s-%s*" cname ftype))
                  do
@@ -159,7 +154,7 @@
   (defun nasy/set-default-font (charset &optional size frame)
     "Set CHARSET fontset to default *font-main* with SIZE on FRAME."
     (when (and (display-graphic-p)
-              (nasy/check-font *font-main-family*))
+               (nasy/check-font *font-main-family*))
       (let ((size (or size *font-main-size*)))
         (set-fontset-font t
                           charset
@@ -208,27 +203,27 @@
                                        frame
                                        'prepend))
   
-                  (setf (alist-get (format ".*%s.*" hfont)
-                                   face-font-rescale-alist
-                                   ,*font-cjk-scale*
-                                   nil
-                                   'string=)
-                        ,*font-cjk-scale*))))))
+                   (setf (alist-get (format ".*%s.*" hfont)
+                                    face-font-rescale-alist
+                                    ,*font-cjk-scale*
+                                    nil
+                                    'string=)
+                         ,*font-cjk-scale*))))))
   
   (defun nasy/set-symbol (charset &optional size weight frame)
-      "Set CHARSET fontset to HanaMin with SIZE with WEIGHT on FRAME.
+    "Set CHARSET fontset to HanaMin with SIZE with WEIGHT on FRAME.
   
     Font for char like ∷."
-      (when (display-graphic-p)
-        (let ((size (or size *font-symbol-size*)))
-          (when (nasy/check-font *font-symbol-family*)
-            (set-fontset-font (frame-parameter nil 'font)
-                              charset
-                              (font-spec :family *font-symbol-family*
-                                         :weight weight
-                                         :size   size)
-                              frame
-                              'prepend)))))
+    (when (display-graphic-p)
+      (let ((size (or size *font-symbol-size*)))
+        (when (nasy/check-font *font-symbol-family*)
+          (set-fontset-font (frame-parameter nil 'font)
+                            charset
+                            (font-spec :family *font-symbol-family*
+                                       :weight weight
+                                       :size   size)
+                            frame
+                            'prepend)))))
   
   (defun nasy/-set--font (frame)
     "Nasy set font for `FRAME'."
@@ -240,10 +235,10 @@
       ;; default
       (when (nasy/check-font *font-main-family*)
         (set-face-attribute
-            'default nil
-            :font (font-spec :family *font-main-family*
-                             :weight *font-main-weight*
-                             :size   *font-main-size*)))
+         'default nil
+         :font (font-spec :family *font-main-family*
+                          :weight *font-main-weight*
+                          :size   *font-main-size*)))
       ;; 中文
       (dolist (charset '(kana han cjk-misc bopomofo))
         (progn
@@ -268,7 +263,7 @@
                        (setf (alist-get ffn face-font-rescale-alist fss nil 'string=) fss))))))
   
       (when (and *is-a-mac*
-                (nasy/check-font "Apple Color Emoji"))
+                 (nasy/check-font "Apple Color Emoji"))
         ;; For NS/Cocoa
         (set-fontset-font (frame-parameter nil 'font)
                           'symbol
@@ -304,10 +299,7 @@
         (set-face-attribute 'header-line nil
                             :font (font-spec :family *font-header-line-family*
                                              :weight *font-header-line-weight*
-                                             :size   *font-header-line-size*)))
-  
-      (after-x 'doom-modeline
-        (doom-modeline--set-char-widths doom-modeline-rhs-icons-alist)))
+                                             :size   *font-header-line-size*))))
     (run-hooks 'nasy/font-change-hook))
   
   
@@ -387,7 +379,7 @@
     (nasy/set-font))
 #+end_src
 ** 指定模式禁用行号
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      ;; (defun my-inhibit-global-linum-mode ()
      ;;   "Counter-act `global-linum-mode'."
      ;;   (add-hook 'after-change-major-mode-hook
@@ -404,8 +396,8 @@
      ;; 
    #+end_src
 
-** 设定macOS上的窗口样式
-   #+begin_src elisp
+** 设定 macOS 上的窗口样式
+   #+begin_src emacs-lisp
      (leaf mac-frame
        :when *is-a-mac*
        :config
@@ -425,13 +417,13 @@
    #+end_src
 
 ** 主题设定
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (add-to-list 'load-path (expand-file-name "emacs-nasy-theme" user-emacs-directory))
      (require 'nasy-theme)
      (load-theme 'nasy t)
    #+end_src
 ** 工具栏设定
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (leaf tool-bar
        :tag "builtin"
        :bind
@@ -452,9 +444,7 @@
 
 ** 一些关于界面的插件
 *** 彩虹括号
-    #+begin_src elisp
-      (straight-use-package 'rainbow-delimiters)
-
+    #+begin_src emacs-lisp
       (leaf rainbow-delimiters
         :hook
         (prog-mode-hook . rainbow-delimiters-mode)
@@ -470,33 +460,21 @@
          '(rainbow-delimiters-depth-6-face ((t (:inherit rainbow-delimiters-base-face :foreground "MediumSlateBlue"))))
          '(rainbow-delimiters-depth-7-face ((t (:inherit rainbow-delimiters-base-face :foreground "blue violet"))))
          '(rainbow-delimiters-depth-8-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))
-         '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))))
-    #+end_src
-
-*** 彩虹猫
-    #+begin_src elisp
-      ;;(straight-use-package 'nyan-mode)
-      ;;(leaf nyan-mode
-      ;;  :custom (nyan-animate-nyancat . t)
-      ;;	  (nyan-bar-length      . 16)
-      ;;	  (nyan-wavy-trail      . t)
-      ;;  :hook after-init-hook)
-      ;;
-      ;;
+         '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink")))))
+        :init (straight-use-package 'rainbow-delimiters))
     #+end_src
 
 *** 对齐线
-    #+begin_src elisp
+    #+begin_src emacs-lisp
       (when (graphic-p)
-	(straight-use-package 'highlight-indent-guides)
-
-	(leaf highlight-indent-guides
-	  :hook (prog-mode-hook text-mode-hook org-mode-hook)
-	  :config
-	  (setq highlight-indent-guides-method 'bitmap)))
+        (leaf highlight-indent-guides
+          :hook (prog-mode-hook text-mode-hook org-mode-hook)
+          :config
+          (setq highlight-indent-guides-method 'bitmap)
+          :init (straight-use-package 'highlight-indent-guides)))
     #+end_src
 * 编辑器
-  #+begin_src elisp
+  #+begin_src emacs-lisp
     ;; 自动加载外部修改过的文件
     (global-auto-revert-mode 1)
     ;; 关闭自己生产的保存文件
@@ -518,13 +496,13 @@
 * 包
 
 ** Minions
-#+begin_src elisp
+#+begin_src emacs-lisp
   (leaf minions
     :config (minions-mode 1)
     :init (straight-use-package 'minions))
 #+end_src
 ** Selectrum
-#+begin_src elisp
+#+begin_src emacs-lisp
   (leaf selectrum
     :config
     (selectrum-mode +1)
@@ -532,31 +510,28 @@
 #+end_src
 
 ** Consult
-#+begin_src elisp
+#+begin_src emacs-lisp
   (leaf consult
     :init (straight-use-package 'consult))
 #+end_src
 
 ** Orderless
-#+begin_src elisp
+#+begin_src emacs-lisp
   (leaf orderless
     :custom (completion-styles . '(orderless))
     :config (savehist-mode)
     :init (straight-use-package 'orderless))
 #+end_src
 ** Projectile
-   #+begin_src elisp
-     (straight-use-package 'projectile)
-
+   #+begin_src emacs-lisp
      (leaf projectile
        :config
-       (projectile-mode +1))
-
+       (projectile-mode +1)
+       :init (straight-use-package 'projectile))
+     
    #+end_src
 ** Company
-   #+begin_src elisp
-     (straight-use-package 'company)
-
+   #+begin_src emacs-lisp
      (leaf company
        :hook
        (after-init-hook . global-company-mode)
@@ -569,56 +544,49 @@
          ("M-n" . nil)
          ("M-p" . nil)
          ("C-n" . company-select-next)
-         ("C-p" . company-select-previous))))
+         ("C-p" . company-select-previous)))
+       :init (straight-use-package 'company))
    #+end_src
 
 ** Lsp-mode
-   #+begin_src elisp
-     (straight-use-package 'lsp-mode)
-
+   #+begin_src emacs-lisp
      (leaf lsp-mode
-       :commands lsp)
+       :commands lsp
+       :init (straight-use-package 'lsp-mode))
    #+end_src
 
 ** Flycheck
-   #+begin_src elisp
-     (straight-use-package 'flycheck)
-
+   #+begin_src emacs-lisp
      (leaf flycheck
-       :hook prog-mode-hook)
+       :hook prog-mode-hook
+       :init (straight-use-package 'flycheck))
    #+end_src
 
 ** Which-key
-   #+begin_src elisp
-     (straight-use-package 'which-key)
-
+   #+begin_src emacs-lisp
      (leaf which-key
-       :doc "Emacs package that displays available keybindings in popup."
-       :url "https://github.com/justbur/emacs-which-key"
-       :tag "help"
        :custom (which-key-allow-imprecise-window-fit . nil)
-       :hook 'after-init-hook)
+       :hook 'after-init-hook
+       :init (straight-use-package 'which-key))
    #+end_src
 ** Org-babel
-   #+begin_src elisp
+   #+begin_src emacs-lisp
    (custom-set-variables
       '(org-babel-load-languages (quote ((emacs-lisp . t) (haskell . t))))
       '(org-confirm-babel-evaluate nil))
    #+end_src
    
 ** Emacs-Rime
-   #+begin_src elisp
-     (straight-use-package 'rime)
-
+   #+begin_src emacs-lisp
      (leaf rime
        :bind
        (:rime-mode-map
-	("C-`"   . rime-send-keybinding)
-	("C-S-`" . rime-send-keybinding)
-	("C-,"   . rime-send-keybinding))
+        ("C-`"   . rime-send-keybinding)
+        ("C-S-`" . rime-send-keybinding)
+        ("C-,"   . rime-send-keybinding))
        (:rime-active-mode-map
-	("C-;"   . rime-send-keybinding)
-	("C-SPC" . rime-send-keybinding))
+        ("C-;"   . rime-send-keybinding)
+        ("C-SPC" . rime-send-keybinding))
        :custom
        `(rime-emacs-module-header-root    . ,(expand-file-name "/opt/local/include"))
        `(rime-user-data-dir   . ,(expand-file-name "~/.config/rime"))
@@ -629,30 +597,32 @@
        (rime-posframe-style   . 'vertical)
        (rime-show-preedit     . t)
        (rime-translate-keybindings
-	. '("C-f"
-	    "C-b"
-	    "C-n"
-	    "C-p"
-	    "C-g"
-	    "C-`"
-	    "C-;"
-	    "C-SPC"
-	    "<left>"
-	    "<right>"
-	    "<up>"
-	    "<down>"
-	    "<prior>"
-	    "<next>"
-	    "<delete>")))
+        . '("C-f"
+            "C-b"
+            "C-n"
+            "C-p"
+            "C-g"
+            "C-`"
+            "C-;"
+            "C-SPC"
+            "<left>"
+            "<right>"
+            "<up>"
+            "<down>"
+            "<prior>"
+            "<next>"
+            "<delete>"))
+       :init (straight-use-package 'rime))
    #+end_src
 ** Exec-path-from-shell
-   #+begin_src elisp
-     (straight-use-package 'exec-path-from-shell)
-     (exec-path-from-shell-initialize)
+   #+begin_src emacs-lisp
+     (leaf exec-path-from-shell
+       :config (exec-path-from-shell-initialize)
+       :init (straight-use-package 'exec-path-from-shell))
    #+end_src
 
 ** Org-mode
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (leaf org
        :config
        (setq org-startup-indented t)
@@ -662,126 +632,125 @@
    #+end_src
 
 ** Org-static-blog
-   #+begin_src elisp
-     (straight-use-package 'org-static-blog)
-
-     (setq org-static-blog-publish-title "Ethereal Horizon")
-     (setq org-static-blog-publish-url "https://keke-cute.github.io/")
-     (setq org-static-blog-publish-directory "~/Repos/keke-cute.github.io")
-     (setq org-static-blog-posts-directory "~/Repos/keke-cute.github.io/posts")
-     (setq org-static-blog-drafts-directory "~/Repos/keke-cute.github.io/drafts")
-     (setq org-static-blog-enable-tags t)
-     (setq org-export-with-toc nil)
-     (setq org-export-with-section-numbers nil)
-
-     ;; This header is inserted into the <head> section of every page:
-     ;;   (you will need to create the style sheet at
-     ;;    ~/projects/blog/static/style.css
-     ;;    and the favicon at
-     ;;    ~/projects/blog/static/favicon.ico)
-     (setq org-static-blog-page-header
-     "<meta name=\"author\" content=\"keke\">
+   #+begin_src emacs-lisp
+     (leaf org-static-blog
+       :config
+       (setq org-static-blog-publish-title "Ethereal Horizon")
+       (setq org-static-blog-publish-url "https://keke-cute.github.io/")
+       (setq org-static-blog-publish-directory "~/Repos/keke-cute.github.io")
+       (setq org-static-blog-posts-directory "~/Repos/keke-cute.github.io/posts")
+       (setq org-static-blog-drafts-directory "~/Repos/keke-cute.github.io/drafts")
+       (setq org-static-blog-enable-tags t)
+       (setq org-export-with-toc nil)
+       (setq org-export-with-section-numbers nil)
+     
+       ;; This header is inserted into the <head> section of every page:
+       ;;   (you will need to create the style sheet at
+       ;;    ~/projects/blog/static/style.css
+       ;;    and the favicon at
+       ;;    ~/projects/blog/static/favicon.ico)
+       (setq org-static-blog-page-header
+             "<meta name=\"author\" content=\"keke\">
      <meta name=\"referrer\" content=\"no-referrer\">
      <link href= \"static/style.css\" rel=\"stylesheet\" type=\"text/css\" />
      <link rel=\"icon\" href=\"static/favicon.ico\">")
-
-     ;; This preamble is inserted at the beginning of the <body> of every page:
-     ;;   This particular HTML creates a <div> with a simple linked headline
-     (setq org-static-blog-page-preamble
-     "<div class=\"header\">
+     
+       ;; This preamble is inserted at the beginning of the <body> of every page:
+       ;;   This particular HTML creates a <div> with a simple linked headline
+       (setq org-static-blog-page-preamble
+             "<div class=\"header\">
        <a href=\"https://keke-cute.github.io\">Ethereal Horizon</a> <A href=\"https://keke-cute.github.io/emacs.html\">Emacs Configure</a>
      </div>")
-
-     ;; This postamble is inserted at the end of the <body> of every page:
-     ;;   This particular HTML creates a <div> with a link to the archive page
-     ;;   and a licensing stub.
-     (setq org-static-blog-page-postamble
-     "<div id=\"archive\">
+     
+       ;; This postamble is inserted at the end of the <body> of every page:
+       ;;   This particular HTML creates a <div> with a link to the archive page
+       ;;   and a licensing stub.
+       (setq org-static-blog-page-postamble
+             "<div id=\"archive\">
        <a href=\"https://keke-cute.github.io/archive.html\">Other posts</a>
      </div>
      <center><a rel=\"license\" href=\"https://creativecommons.org/licenses/by-sa/3.0/\"><img alt=\"Creative Commons License\" style=\"border-width:0\" src=\"https://i.creativecommons.org/l/by-sa/3.0/88x31.png\" /></a><br /><span xmlns:dct=\"https://purl.org/dc/terms/\" href=\"https://purl.org/dc/dcmitype/Text\" property=\"dct:title\" rel=\"dct:type\">Ethereal Horizon</span> by <a xmlns:cc=\"https://creativecommons.org/ns#\" href=\"https://github.com/keke-cute\" property=\"cc:attributionName\" rel=\"cc:attributionURL\">不可视界线</a> is licensed under a <a rel=\"license\" href=\"https://creativecommons.org/licenses/by-sa/3.0/\">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.</center>")
-
-     ;; This HTML code is inserted into the index page between the preamble and
-     ;;   the blog posts
-     (setq org-static-blog-index-front-matter
-     "<h1> Ethereal Horizon </h1>\n")
+     
+       ;; This HTML code is inserted into the index page between the preamble and
+       ;;   the blog posts
+       (setq org-static-blog-index-front-matter
+             "<h1> Ethereal Horizon </h1>\n")
+       :init (straight-use-package 'org-static-blog))
+     
    #+end_src
 
 ** Org-superstar-mode
-   #+begin_src elisp
-     (straight-use-package 'org-superstar)
-
+   #+begin_src emacs-lisp
      (leaf org-superstar
        :hook
        (org-mode-hook)
        (nasy/font-change-hook
-	. (lambda ()
-	    (progn
-	      (nasy/set-symbol ?☯ 21 nil)
-	      (nasy/set-symbol ?✿ 18 nil)
-	      (nasy/set-symbol ?❀ 16 nil)
-	      (nasy/set-symbol ?✫ 15 nil)
-	      (nasy/set-symbol ?✸ 16 nil)
-	      (nasy/set-symbol ?◉ 16 nil)
-	      (nasy/set-symbol ?✼ 12 nil)
-	      (nasy/set-symbol ?✚ 12 nil)
-	      (nasy/set-symbol ?⁍ 13 nil)
-	      (nasy/change-char-width ?☯ 2)
-	      (nasy/change-char-width ?✿ 2)
-	      (nasy/change-char-width ?❀ 2)
-	      (nasy/change-char-width ?✫ 2)
-	      (nasy/change-char-width ?✸ 2)
-	      (nasy/change-char-width ?◉ 2)
-	      (nasy/change-char-width ?✼ 1)
-	      (nasy/change-char-width ?✚ 1)
-	      (nasy/change-char-width ?⁍ 1))))
+        . (lambda ()
+            (progn
+              (nasy/set-symbol ?☯ 21 nil)
+              (nasy/set-symbol ?✿ 18 nil)
+              (nasy/set-symbol ?❀ 16 nil)
+              (nasy/set-symbol ?✫ 15 nil)
+              (nasy/set-symbol ?✸ 16 nil)
+              (nasy/set-symbol ?◉ 16 nil)
+              (nasy/set-symbol ?✼ 12 nil)
+              (nasy/set-symbol ?✚ 12 nil)
+              (nasy/set-symbol ?⁍ 13 nil)
+              (nasy/change-char-width ?☯ 2)
+              (nasy/change-char-width ?✿ 2)
+              (nasy/change-char-width ?❀ 2)
+              (nasy/change-char-width ?✫ 2)
+              (nasy/change-char-width ?✸ 2)
+              (nasy/change-char-width ?◉ 2)
+              (nasy/change-char-width ?✼ 1)
+              (nasy/change-char-width ?✚ 1)
+              (nasy/change-char-width ?⁍ 1))))
        :custom
        ((org-superstar-special-todo-items . t)
-	(org-superstar-headline-bullets-list
-	 . '("☯"
-	     "✿"
-	     "❀"
-	     "✫"
-	     "✸"
-	     "◉"))
-	(org-superstar-item-bullet-alist
-	 . '((?* . ?✼)
-	     (?+ . ?✚)
-	     (?- . ?⁍)))))
-
-
+        (org-superstar-headline-bullets-list
+         . '("☯"
+             "✿"
+             "❀"
+             "✫"
+             "✸"
+             "◉"))
+        (org-superstar-item-bullet-alist
+         . '((?* . ?✼)
+             (?+ . ?✚)
+             (?- . ?⁍))))
+       :init (straight-use-package 'org-superstar))
    #+end_src
 
 ** Org-Roam
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (straight-use-package '(org-roam :type git :host github :branch "v2"))
-
+     
      (leaf org-roam
        :after org
        :commands
        (org-roam-buffer
-	org-roam-setup
-	org-roam-capture
-	org-roam-node-find)
+        org-roam-setup
+        org-roam-capture
+        org-roam-node-find)
        :custom
        `(org-roam-directory . ,(expand-file-name "~/Repos/roam"))
        :config
        (org-roam-setup))
    #+end_src
 ** Magit
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (straight-use-package 'magit)
    #+end_src
 ** Telega
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (straight-use-package '(telega :type git :host github :branch "releases"))
    #+end_src
 ** Htmlize
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (straight-use-package 'htmlize)
    #+end_src
 ** Hydra
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (straight-use-package 'hydra)
      
      (after-x 'hydra
@@ -802,32 +771,26 @@
          ("T" treemacs-display-current-project-exclusively "Current Project in Treemacs")))
    #+end_src
 ** Treemacs
-   #+begin_src elisp
-     (straight-use-package 'treemacs)
-
+   #+begin_src emacs-lisp
      (leaf treemacs
-       :bind (("M-O" . treemacs-select-window)))
+       :bind (("M-O" . treemacs-select-window))
+       :init (straight-use-package 'treemacs))
    #+end_src
 ** Ace-Window
-   #+begin_src elisp
-     (straight-use-package 'ace-window)
-
+   #+begin_src emacs-lisp
      (leaf ace-window
-       :bind (("M-o" . ace-window)))
+       :bind (("M-o" . ace-window))
+       :init (straight-use-package 'ace-window))
    #+end_src   
 ** Dired-hacks
-   [[https://github.com/nasyxx/emacs.d/blob/master/literate-config/editor/dired.org]]
-   #+begin_src elisp
-     (straight-use-package 'dired-hacks)
+[[https://github.com/nasyxx/emacs.d/blob/master/%E8%94%93%E8%89%B8/%E6%9C%88%E5%87%BA/%E7%AF%87.org][蔓艸/月出/篇.org]]
+   #+begin_src emacs-lisp
      (leaf dired-hacks
-       :doc "Collection of useful dired additions"
-       :url "https://github.com/Fuco1/dired-hacks"
-       :tag "files")
+       :init (straight-use-package 'dired-hacks))
    #+end_src
    Dired Filter:
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (leaf dired-filter
-       :tag "files"
        :bind
        (:dired-filter-map
 	("p" . dired-filter-pop-all))
@@ -865,71 +828,62 @@
 	      (extension "jpg" "JPG" "webp" "png" "PNG" "jpeg" "JPEG" "bmp" "BMP" "TIFF" "tiff" "gif" "GIF"))))))
    #+end_src
    Dired Rainbow:
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (leaf dired-rainbow
-       :tag "files"
+       :after dired  
        :commands dired
        :require t
        :defer-config
        (dired-rainbow-define html "#eb5286"
-			     ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
+                             ("css" "less" "sass" "scss" "htm" "html" "jhtm" "mht" "eml" "mustache" "xhtml"))
        (dired-rainbow-define xml "#f2d024"
-			     ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
+                             ("xml" "xsd" "xsl" "xslt" "wsdl" "bib" "json" "msg" "pgn" "rss" "yaml" "yml" "rdata"))
        (dired-rainbow-define document "#9561e2"
-			     ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
+                             ("docm" "doc" "docx" "odb" "odt" "pdb" "pdf" "ps" "rtf" "djvu" "epub" "odp" "ppt" "pptx"))
        (dired-rainbow-define markdown "#705438"
-			     ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt" "ass"))
+                             ("org" "etx" "info" "markdown" "md" "mkd" "nfo" "pod" "rst" "tex" "textfile" "txt" "ass"))
        (dired-rainbow-define database "#6574cd"
-			     ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
+                             ("xlsx" "xls" "csv" "accdb" "db" "mdb" "sqlite" "nc"))
        (dired-rainbow-define media "#de751f"
-			     ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac" "mkv"))
+                             ("mp3" "mp4" "MP3" "MP4" "avi" "mpeg" "mpg" "flv" "ogg" "mov" "mid" "midi" "wav" "aiff" "flac" "mkv"))
        (dired-rainbow-define image "#f66d9b"
-			     ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
+                             ("tiff" "tif" "cdr" "gif" "ico" "jpeg" "jpg" "png" "psd" "eps" "svg"))
        (dired-rainbow-define log "#c17d11"
-			     ("log"))
+                             ("log"))
        (dired-rainbow-define shell "#f6993f"
-			     ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
+                             ("awk" "bash" "bat" "sed" "sh" "zsh" "vim"))
        (dired-rainbow-define interpreted "#38c172"
-			     ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
+                             ("py" "ipynb" "rb" "pl" "t" "msql" "mysql" "pgsql" "sql" "r" "clj" "cljs" "scala" "js"))
        (dired-rainbow-define compiled "#4dc0b5"
-			     ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
+                             ("asm" "cl" "lisp" "el" "c" "h" "c++" "h++" "hpp" "hxx" "m" "cc" "cs" "cp" "cpp" "go" "f" "for" "ftn" "f90" "f95" "f03" "f08" "s" "rs" "hi" "hs" "pyc" ".java"))
        (dired-rainbow-define executable "#8cc4ff"
-			     ("exe" "msi"))
+                             ("exe" "msi"))
        (dired-rainbow-define compressed "#51d88a"
-			     ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
+                             ("7z" "zip" "bz2" "tgz" "txz" "gz" "xz" "z" "Z" "jar" "war" "ear" "rar" "sar" "xpi" "apk" "xz" "tar"))
        (dired-rainbow-define packaged "#faad63"
-			     ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
+                             ("deb" "rpm" "apk" "jad" "jar" "cab" "pak" "pk3" "vdf" "vpk" "bsp"))
        (dired-rainbow-define encrypted "#ffed4a"
-			     ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
+                             ("gpg" "pgp" "asc" "bfe" "enc" "signature" "sig" "p12" "pem"))
        (dired-rainbow-define fonts "#6cb2eb"
-			     ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
+                             ("afm" "fon" "fnt" "pfb" "pfm" "ttf" "otf"))
        (dired-rainbow-define partition "#e3342f"
-			     ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
+                             ("dmg" "iso" "bin" "nrg" "qcow" "toast" "vcd" "vmdk" "bak"))
        (dired-rainbow-define vc "#0074d9"
-			     ("git" "gitignore" "gitattributes" "gitmodules"))
+                             ("git" "gitignore" "gitattributes" "gitmodules"))
        (dired-rainbow-define-chmod directory "#6cb2eb" "d.*")
        (dired-rainbow-define-chmod executable-unix "#38c172" "-.*x.*"))
-
-   #+end_src
-   Dired Narrow:
-   #+begin_src elisp
-     (leaf dired-narrow
-       :tag "files"
-       :bind ((:dired-narrow-map
-	       ("<down>"  . dired-narrow-next-file)
-	       ("<up>"    . dired-narrow-previous-file)
-	       ("<right>" . dired-narrow-enter-directory))))
+     
    #+end_src
    Dired Collapse:
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (leaf dired-collapse
-       :tag "files"
+       :after dired
        :hook dired-mode-hook)
    #+end_src
 * 编程语言
 
 ** Haskell
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      ;;(straight-use-package 'haskell-mode)
      ;;
      ;;(leaf haskell-mode
@@ -940,19 +894,18 @@
    #+end_src
 
 ** Golang
-   #+begin_src elisp
-     (straight-use-package 'go-mode)
-
+   #+begin_src emacs-lisp
      (leaf go-mode
        :hook
-       (go-mode-hook . lsp))
+       (go-mode-hook . lsp)
+       :init (straight-use-package 'go-mode))
    #+end_src
 ** Nix
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (straight-use-package 'nix-mode)
    #+end_src
 
 ** Yaml
-   #+begin_src elisp
+   #+begin_src emacs-lisp
      (straight-use-package 'yaml-mode)
    #+end_src
