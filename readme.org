@@ -1,7 +1,7 @@
 #+title: 我的 Emacs 配置文件
 #+author: keke
 #+email: librek@protonmail.com
-#+date: <2021-06-11 Fri>
+#+date: <2021-06-21 Mon>
 #+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="me.css" /> <a href="index.html">Back To Home</a>
@@ -61,180 +61,6 @@
       "output opengpg card message"
       (shell-command "gpg --card-status"))
   #+end_src
-* Nasy's Font
-  [[https://github.com/nasyxx/emacs.d/tree/master/literate-config/ui]]  
-  #+begin_src elisp
-    (defvar nasy/font-change-hook nil
-      "Hooks to run after font changed.")
-
-    (defun nasy/check-font (font)
-      "Check if FONT avaliable."
-      (if (find-font (font-spec :family font
-				:weight *font-main-weight*
-				:size   *font-main-size*))
-	  t
-	(message (format "`%s' font not find" font))))
-
-    (defun nasy/set-default-font (charset &optional size frame)
-      "Set CHARSET fontset to default *font-main* with SIZE on FRAME."
-      (when (and (display-graphic-p)
-		(nasy/check-font *font-main-family*))
-	(let ((size (or size *font-main-size*)))
-	  (set-fontset-font t
-			    charset
-			    (font-spec :family *font-main-family*
-				       :weight *font-main-weight*
-				       :size   size)
-			    frame
-			    'prepend))))
-
-    (defun nasy/set-hanamin (charset &optional size frame)
-      "Set CHARSET fontset to HanaMin with SIZE on FRAME.
-    https://github.com/cjkvi/HanaMinAFDKO/releases
-    Font for char like 𨉚."
-      (when (display-graphic-p)
-	(let ((size (or size *font-cjk-size*)))
-	  (when (nasy/check-font "HanaMinB")
-	    (set-fontset-font (frame-parameter nil 'font)
-			      charset
-			      (font-spec :family "HanaMinB"
-					 :weight 'normal
-					 :size   size)
-			      frame
-			      'prepend))
-	  (when (nasy/check-font "HanaMinA")
-	    (set-fontset-font (frame-parameter nil 'font)
-			      charset
-			      (font-spec :family "HanaMinA"
-					 :weight 'normal
-					 :size   size)
-			      frame
-			      'prepend))
-	  (setf (alist-get ".*HanaMinA.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)
-		,*font-cjk-scale*)
-	  (setf (alist-get ".*HanaMinB.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)
-		,*font-cjk-scale*)
-	  (cl-loop for sfx in (reverse '("A" "B" "C" "Ex A1" "Ex A2" "Ex B" "Ex C" "I"))
-		   for hfont = (concat "Hanazono Mincho " sfx)
-		   do
-		   (progn
-		     (when (nasy/check-font hfont)
-		       (set-fontset-font (frame-parameter nil 'font)
-					 charset
-					 (font-spec :family hfont
-						    :weight 'normal
-						    :size   size)
-					 frame
-					 'prepend))
-
-		    (setf (alist-get (format ".*%s.*" hfont)
-				     face-font-rescale-alist
-				     ,*font-cjk-scale*
-				     nil
-				     'string=)
-			  ,*font-cjk-scale*))))))
-
-    (defun nasy/set-symbol (charset &optional size weight frame)
-	"Set CHARSET fontset to HanaMin with SIZE with WEIGHT on FRAME.
-
-      Font for char like ∷."
-	(when (display-graphic-p)
-	  (let ((size (or size *font-symbol-size*)))
-	    (when (nasy/check-font *font-symbol-family*)
-	      (set-fontset-font (frame-parameter nil 'font)
-				charset
-				(font-spec :family *font-symbol-family*
-					   :weight weight
-					   :size   size)
-				frame
-				'prepend)))))
-
-    (defun nasy/set--font (frame)
-      "Nasy set font for `FRAME'."
-      (when (display-graphic-p)
-	;; default
-	(when (nasy/check-font *font-main-family*)
-	  (set-face-attribute
-	      'default nil
-	      :font (font-spec :family *font-main-family*
-			       :weight *font-main-weight*
-			       :size   *font-main-size*)))
-	;; 中文
-	(dolist (charset '(kana han cjk-misc bopomofo))
-	  (progn
-	    (nasy/set-hanamin charset)
-	    (cl-loop for fn in (reverse '("" "-2" "-3" "-4" "-5"))
-		     for fpf = (format "*font-cjk%s" fn)
-		     for ff  = (eval (intern (concat fpf "-family*")))
-		     for fw  = (eval (intern (concat fpf "-weight*")))
-		     for fs  = (eval (intern (concat fpf "-size*")))
-		     for fss = (eval (intern (concat fpf "-scale*")))
-		     do
-		     (progn
-		       (when (nasy/check-font ff)
-			 (set-fontset-font (frame-parameter nil 'font)
-					   charset
-					   (font-spec :family ff
-						      :weight fw
-						      :size   fs)
-					   frame
-					   'prepend))
-		       (let ((ffn (concat ".*" ff ".*")))
-			 (setf (alist-get ffn face-font-rescale-alist fss nil 'string=) fss))))))
-
-	(when (and *is-a-mac*
-		  (nasy/check-font "Apple Color Emoji"))
-	  ;; For NS/Cocoa
-	  (set-fontset-font (frame-parameter nil 'font)
-			    'symbol
-			    (font-spec :family "Apple Color Emoji")
-			    frame
-			    'prepend))
-
-	(when (nasy/check-font *font-symbol-family*)
-	  (set-fontset-font (frame-parameter nil 'font)
-			    'symbol
-			    (font-spec :family *font-symbol-family*
-				       :weight *font-symbol-weight*
-				       :size   *font-symbol-size*)
-			    frame
-			    'append))
-
-	(when (nasy/check-font *font-mode-line-family*)
-	  (set-face-attribute 'mode-line nil
-			      :font (font-spec :family *font-mode-line-family*
-					       :weight *font-mode-line-weight*
-					       :size   *font-mode-line-size*))
-
-	  (set-face-attribute 'mode-line-inactive nil
-			      :font (font-spec :family *font-mode-line-family*
-					       :weight *font-mode-line-weight*
-					       :size   *font-mode-line-size*)))
-	(when (nasy/check-font *font-tab-line-family*)
-	  (set-face-attribute 'tab-line nil
-			      :font (font-spec :family *font-tab-line-family*
-					       :weight *font-tab-line-weight*
-					       :size   *font-tab-line-size*)))
-	(when (nasy/check-font *font-header-line-family*)
-	  (set-face-attribute 'header-line nil
-			      :font (font-spec :family *font-header-line-family*
-					       :weight *font-header-line-weight*
-					       :size   *font-header-line-size*)))
-
-	(after-x 'doom-modeline
-	  (doom-modeline--set-char-widths doom-modeline-rhs-icons-alist)))
-      (run-hooks 'nasy/font-change-hook))
-
-    (defun nasy/set-font (&rest _)
-      "Nasy set font."
-      (interactive)
-      (nasy/set--font nil))
-
-
-    (add-hook #'after-init-hook #'nasy/set-font)
-    (add-hook #'after-make-frame-functions   #'nasy/set-font)
-    (add-hook #'server-after-make-frame-hook #'nasy/set-font)
-  #+end_src
 * 检测系统
   #+begin_src elisp
     (defconst *is-a-mac* (eq system-type 'darwin))
@@ -263,7 +89,7 @@
 * 界面
 ** 主要的一些设定
    #+begin_src elisp
-     (setq inhibit-splash-screen t)
+     ;;(setq inhibit-splash-screen t)
      (when (graphic-p)
        ;; default frame size
        ;;(setq initial-frame-alist
@@ -274,6 +100,292 @@
        (scroll-bar-mode -1))
    #+end_src
 
+** 字体设定
+[[https://github.com/nasyxx/emacs.d/blob/master/%E8%94%93%E8%89%B8/%E9%A2%A8%E9%9B%A8/%E7%AF%87.org][蔓艸/風雨/篇.org]]
+#+begin_src elisp
+  (defvar nasy/font-change-hook nil
+    "Hooks to run after font changed.")
+  
+  (defvar nasy--cus-font nil)
+  (defvar nasy--set-font nil)
+  
+  
+  (cl-eval-when (compile eval load)
+    (defun nasy/-font-doc (cname ftype)
+      "Generate font custome variable doc with CNAME and FTYPE."
+      (concat "The " cname " font " ftype ".
+    After change it, run `M-x nasy/set-font' to see the effect."))
+  
+  
+    (defun nasy/-cus-font ()
+      "Defcustom some fonts."
+      (setq nasy--cus-font t)
+      (dolist (cname '("main" "symbol" "cjk" "mode-line" "tab-line" "header-line"))
+        (cl-loop for ftype in '("family" "weight" "size" "scale")
+                 for type = (cond ((string= "family" ftype) 'string)
+                                ((string= "weight" ftype) 'symbol)
+                                ((string= "size" ftype)   'float)
+                                ((string= "scale" ftype)  'float)
+                                (t (error "Wrong Font Type")))
+                 for doc  = (nasy/-font-doc cname ftype)
+                 for name = (intern (format "*font-%s-%s*" cname ftype))
+                 do
+                 (progn
+                   (custom-declare-variable name nil doc :group 'nasy-font :type type)
+                   (when (string= "cjk" cname)
+                     (cl-loop for sfxn in '(2 3 4 5)
+                              for cname_ = (format "%s-%d" cname sfxn)
+                              for name_  = (intern (format "*font-%s-%s*" cname_ ftype))
+                              for doc_   = (nasy/-font-doc cname_ ftype)
+                              do
+                              (progn
+                                (custom-declare-variable name_ nil doc_
+                                                         :group 'nasy-font
+                                                         :type type)))))))))
+  
+  
+  (cl-eval-when (compile)
+    (nasy/-cus-font))
+  
+  
+  (defun nasy/check-font (font)
+    "Check if FONT avaliable."
+    (if (find-font (font-spec :family font
+                              :weight *font-main-weight*
+                              :size   *font-main-size*))
+        t
+      (message (format "`%s' font not find" font))))
+  
+  (defun nasy/set-default-font (charset &optional size frame)
+    "Set CHARSET fontset to default *font-main* with SIZE on FRAME."
+    (when (and (display-graphic-p)
+              (nasy/check-font *font-main-family*))
+      (let ((size (or size *font-main-size*)))
+        (set-fontset-font t
+                          charset
+                          (font-spec :family *font-main-family*
+                                     :weight *font-main-weight*
+                                     :size   size)
+                          frame
+                          'prepend))))
+  
+  (defun nasy/set-hanamin (charset &optional size frame)
+    "Set CHARSET fontset to HanaMin with SIZE on FRAME.
+  https://github.com/cjkvi/HanaMinAFDKO/releases
+  Font for char like 𨉚."
+    (when (display-graphic-p)
+      (let ((size (or size *font-cjk-size*)))
+        (when (nasy/check-font "HanaMinB")
+          (set-fontset-font (frame-parameter nil 'font)
+                            charset
+                            (font-spec :family "HanaMinB"
+                                       :weight 'normal
+                                       :size   size)
+                            frame
+                            'prepend))
+        (when (nasy/check-font "HanaMinA")
+          (set-fontset-font (frame-parameter nil 'font)
+                            charset
+                            (font-spec :family "HanaMinA"
+                                       :weight 'normal
+                                       :size   size)
+                            frame
+                            'prepend))
+        (setf (alist-get ".*HanaMinA.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)
+              ,*font-cjk-scale*)
+        (setf (alist-get ".*HanaMinB.*" face-font-rescale-alist *font-cjk-scale* nil 'string=)
+              ,*font-cjk-scale*)
+        (cl-loop for sfx in (reverse '("A" "B" "C" "Ex A1" "Ex A2" "Ex B" "Ex C" "I"))
+                 for hfont = (concat "Hanazono Mincho " sfx)
+                 do
+                 (progn
+                   (when (nasy/check-font hfont)
+                     (set-fontset-font (frame-parameter nil 'font)
+                                       charset
+                                       (font-spec :family hfont
+                                                  :weight 'normal
+                                                  :size   size)
+                                       frame
+                                       'prepend))
+  
+                  (setf (alist-get (format ".*%s.*" hfont)
+                                   face-font-rescale-alist
+                                   ,*font-cjk-scale*
+                                   nil
+                                   'string=)
+                        ,*font-cjk-scale*))))))
+  
+  (defun nasy/set-symbol (charset &optional size weight frame)
+      "Set CHARSET fontset to HanaMin with SIZE with WEIGHT on FRAME.
+  
+    Font for char like ∷."
+      (when (display-graphic-p)
+        (let ((size (or size *font-symbol-size*)))
+          (when (nasy/check-font *font-symbol-family*)
+            (set-fontset-font (frame-parameter nil 'font)
+                              charset
+                              (font-spec :family *font-symbol-family*
+                                         :weight weight
+                                         :size   size)
+                              frame
+                              'prepend)))))
+  
+  (defun nasy/-set--font (frame)
+    "Nasy set font for `FRAME'."
+    (unless nasy--cus-font
+      (nasy/-cus-font))
+    (unless nasy--set-font
+      (nasy/-set-font))
+    (when (display-graphic-p)
+      ;; default
+      (when (nasy/check-font *font-main-family*)
+        (set-face-attribute
+            'default nil
+            :font (font-spec :family *font-main-family*
+                             :weight *font-main-weight*
+                             :size   *font-main-size*)))
+      ;; 中文
+      (dolist (charset '(kana han cjk-misc bopomofo))
+        (progn
+          (nasy/set-hanamin charset)
+          (cl-loop for fn in (reverse '("" "-2" "-3" "-4" "-5"))
+                   for fpf = (format "*font-cjk%s" fn)
+                   for ff  = (eval (intern (concat fpf "-family*")))
+                   for fw  = (eval (intern (concat fpf "-weight*")))
+                   for fs  = (eval (intern (concat fpf "-size*")))
+                   for fss = (eval (intern (concat fpf "-scale*")))
+                   do
+                   (progn
+                     (when (nasy/check-font ff)
+                       (set-fontset-font (frame-parameter nil 'font)
+                                         charset
+                                         (font-spec :family ff
+                                                    :weight fw
+                                                    :size   fs)
+                                         frame
+                                         'prepend))
+                     (let ((ffn (concat ".*" ff ".*")))
+                       (setf (alist-get ffn face-font-rescale-alist fss nil 'string=) fss))))))
+  
+      (when (and *is-a-mac*
+                (nasy/check-font "Apple Color Emoji"))
+        ;; For NS/Cocoa
+        (set-fontset-font (frame-parameter nil 'font)
+                          'symbol
+                          (font-spec :family "Apple Color Emoji")
+                          frame
+                          'prepend))
+  
+      (when (nasy/check-font *font-symbol-family*)
+        (set-fontset-font (frame-parameter nil 'font)
+                          'symbol
+                          (font-spec :family *font-symbol-family*
+                                     :weight *font-symbol-weight*
+                                     :size   *font-symbol-size*)
+                          frame
+                          'append))
+  
+      (when (nasy/check-font *font-mode-line-family*)
+        (set-face-attribute 'mode-line nil
+                            :font (font-spec :family *font-mode-line-family*
+                                             :weight *font-mode-line-weight*
+                                             :size   *font-mode-line-size*))
+  
+        (set-face-attribute 'mode-line-inactive nil
+                            :font (font-spec :family *font-mode-line-family*
+                                             :weight *font-mode-line-weight*
+                                             :size   *font-mode-line-size*)))
+      (when (nasy/check-font *font-tab-line-family*)
+        (set-face-attribute 'tab-line nil
+                            :font (font-spec :family *font-tab-line-family*
+                                             :weight *font-tab-line-weight*
+                                             :size   *font-tab-line-size*)))
+      (when (nasy/check-font *font-header-line-family*)
+        (set-face-attribute 'header-line nil
+                            :font (font-spec :family *font-header-line-family*
+                                             :weight *font-header-line-weight*
+                                             :size   *font-header-line-size*)))
+  
+      (after-x 'doom-modeline
+        (doom-modeline--set-char-widths doom-modeline-rhs-icons-alist)))
+    (run-hooks 'nasy/font-change-hook))
+  
+  
+  (defun nasy/-set-font (&rest _)
+    "Font."
+    (setq nasy--set-font t)
+    (leaf nasy-font
+      :doc "一些默訒値。"
+      :custom
+      (*font-main-family*   . "OperatorMonoSSmLig Nerd Font")
+      (*font-symbol-family* . "Symbola")
+      (*font-cjk-family*    . "STFLGQKJF")
+      (*font-cjk-2-family*  . "FZLiuGongQuanKaiShuJF")
+      ;; I.Ngaan' font from `http://founder.acgvlyric.org/iu/doku.php/造字:開源字型_i.顏體'.
+      (*font-cjk-3-family*  . "I.Ngaan")
+      (*font-cjk-4-family*  . "Kaiti SC")
+      (*font-cjk-5-family*  . "Kaiti TC")
+  
+      ((*font-mode-line-family*
+        ,*font-header-line-family*
+        ,*font-tab-line-family*)
+       . "Recursive Mono Casual Static")
+  
+      ((*font-main-size*
+        ,*font-mode-line-size*)
+       . 14)
+      (*font-tab-line-size* . 13)
+      (*font-symbol-size* . 17)
+      ((*font-cjk-size*
+        ,*font-cjk-2-size*
+        ,*font-cjk-3-size*
+        ,*font-cjk-4-size*
+        ,*font-cjk-5-size*)
+       . nil)
+      (*font-header-line-size* . 12)
+  
+      ((*font-cjk-scale*
+        ,*font-cjk-2-scale*
+        ,*font-cjk-3-scale*
+        ,*font-cjk-4-scale*
+        ,*font-cjk-5-scale*)
+       . 1.3)
+  
+      ((*font-main-weight*
+        ,*font-symbol-weight*
+        ,*font-cjk-weight*
+        ,*font-cjk-2-weight*
+        ,*font-cjk-3-weight*
+        ;; *font-cjk-4-weight*
+        ;; *font-cjk-5-weight*
+        ,*font-mode-line-weight*
+        ,*font-tab-line-weight*
+        ,*font-header-line-weight*)
+       . 'normal)
+  
+      ((*font-cjk-4-weight*
+        ,*font-cjk-5-weight*) . 'bold))
+  
+    (require '芄蘭 nil t))
+  
+  
+  (defun nasy/set-font (&rest _)
+    "Nasy set font."
+    (interactive)
+    (message "setting font...")
+    (nasy/-set--font nil)
+    (message "setting font...done"))
+  
+  (add-hook 'emacs-startup-hook #'nasy/-set-font 98)
+  (add-hook 'emacs-startup-hook #'nasy/-cus-font 97)
+  ;; (add-hook 'after-init-hook #'nasy/set-font)
+  (add-hook 'emacs-startup-hook #'nasy/set-font 99)
+  ;; (add-hook 'nasy-first-key-hook #'nasy/set-font)
+  ;; (add-hook 'after-make-frame-functions #'nasy/set-font)
+  
+  (when noninteractive
+    (nasy/set-font))
+#+end_src
 ** 指定模式禁用行号
    #+begin_src elisp
      ;; (defun my-inhibit-global-linum-mode ()
@@ -290,61 +402,6 @@
      ;;   (telega-chat-mode-hook . my-inhibit-global-linum-mode)
      ;;   (telega-root-mode-hook . my-inhibit-global-linum-mode))
      ;; 
-   #+end_src
-
-** 字体设定
-   #+begin_src elisp
-     (leaf nasy-font
-       :doc "一些默訒値。"
-       :custom
-       ((*font-main-family*   . "OperatorMonoSSmLig Nerd Font")
-        (*font-symbol-family* . "Symbola")
-        (*font-cjk-family*    . "STFLGQKJF")
-        (*font-cjk-2-family*  . "FZLiuGongQuanKaiShuJF")
-        ;; I.Ngaan' font from `http://founder.acgvlyric.org/iu/doku.php/造字:開源字型_i.顏體'.
-        (*font-cjk-3-family*  . "I.Ngaan")
-        (*font-cjk-4-family*  . "Kaiti SC")
-        (*font-cjk-5-family*  . "Kaiti TC")
-        ((*font-mode-line-family*
-          ,*font-header-line-family*
-          ,*font-tab-line-family*)
-         . "Recursive Mono Casual Static"))
-
-       (((*font-main-size*
-          ,*font-mode-line-size*)
-         . 14)
-        (*font-symbol-size* . 17)
-        ((*font-cjk-size*
-          ,*font-cjk-2-size*
-          ,*font-cjk-3-size*
-          ,*font-cjk-4-size*
-          ,*font-cjk-5-size*)
-         . nil)
-        ((*font-tab-line-size*
-          ,*font-header-line-size*)
-         . 12))
-
-       ((*font-cjk-scale*
-          ,*font-cjk-2-scale*
-          ,*font-cjk-3-scale*
-          ,*font-cjk-4-scale*
-          ,*font-cjk-5-scale*)
-        . 1.3)
-
-       ((*font-main-weight*
-         ,*font-symbol-weight*
-         ,*font-cjk-weight*
-         ,*font-cjk-2-weight*
-         ,*font-cjk-3-weight*
-         ;; *font-cjk-4-weight*
-         ;; *font-cjk-5-weight*
-         ,*font-mode-line-weight*
-         ,*font-tab-line-weight*
-         ,*font-header-line-weight*)
-        . 'normal)
-
-       ((*font-cjk-4-weight*
-         ,*font-cjk-5-weight*) . 'bold))
    #+end_src
 
 ** 设定macOS上的窗口样式
@@ -418,13 +475,14 @@
 
 *** 彩虹猫
     #+begin_src elisp
-      (straight-use-package 'nyan-mode)
-      (leaf nyan-mode
-	:custom (nyan-animate-nyancat . t)
-		(nyan-bar-length      . 16)
-		(nyan-wavy-trail      . t)
-	:hook after-init-hook)
-
+      ;;(straight-use-package 'nyan-mode)
+      ;;(leaf nyan-mode
+      ;;  :custom (nyan-animate-nyancat . t)
+      ;;	  (nyan-bar-length      . 16)
+      ;;	  (nyan-wavy-trail      . t)
+      ;;  :hook after-init-hook)
+      ;;
+      ;;
     #+end_src
 
 *** 对齐线
@@ -437,154 +495,6 @@
 	  :config
 	  (setq highlight-indent-guides-method 'bitmap)))
     #+end_src
-*** Doom-modeline
-    #+begin_src elisp
-      (straight-use-package 'doom-modeline)
-
-      (leaf doom-modeline
-	:hook after-init-hook
-	:custom
-	((doom-modeline-height                      . 25)
-	 (doom-modeline-bar-width                   . 5)
-	 (doom-modeline-window-width-limit          . fill-column))
-	(doom-modeline-buffer-encoding             . nil)
-	(doom-modeline-indent-info                 . nil)
-	(doom-modeline-persp-name                  . nil)
-	(doom-modeline-display-default-persp-name  . nil)
-	(doom-modeline-checker-simple-format       . nil))
-    #+end_src
-
-*** Doom-Themes
-    #+begin_src elisp
-      (straight-use-package 'doom-themes)
-
-      (leaf doom-themes
-	:custom
-	((doom-dracula-brighter-comments
-	  doom-dracula-colorful-headers
-	  doom-dracula-comment-bg) . t)
-	(doom-themes-treemacs-theme . "doom-colors")
-	:config
-	(after-x 'treemacs
-	  (doom-themes-treemacs-config))
-	(doom-themes-visual-bell-config)
-	(after-x 'org-mode
-	  (doom-themes-org-config)))
-    #+end_src    
-
-*** Centaur-tabs
-#+begin_src elisp
-  (straight-use-package 'centaur-tabs)
-  
-  (leaf centaur-tabs
-    :leaf-defer nil
-    :custom
-    ((centaur-tabs-show-navigation-buttons . t)
-     (centaur-tabs-set-icons . t)
-     (centaur-tabs-style . 'wave)
-     (centaur-tabs-set-modified-marker . t)
-     (centaur-tabs-modified-marker . "✰"))
-    :config
-    (centaur-tabs-mode t))
-#+end_src
-
-*** Dashboard
-[[https://github.com/nasyxx/emacs.d/blob/master/%E8%94%93%E8%89%B8/%E5%BA%AD%E5%B0%9E/%E7%AF%87.org]]
-    #+begin_src elisp
-      (leaf page-break-lines
-        :hook
-        (after-init-hook . global-page-break-lines-mode)
-        (nasy/font-change-hook
-         . (lambda ()
-             (progn
-               (nasy/change-char-width page-break-lines-char 2)
-               (nasy/set-symbol ?⊸ 18 nil))))
-        :custom
-        (page-break-lines-char . ?⊸))
-      
-      (leaf dashboard
-        :commands (dashboard-refresh-buffer
-                   dashboard-setup-startup-hook)
-        :init (straight-use-package 'dashboard))
-      
-      (defun nasy/-set-dashboard-init-info (&rest _)
-        (setq dashboard-init-info
-              (let ((package-count 0) (time (emacs-init-time)))
-                (setq package-count (+ (hash-table-size straight--profile-cache) package-count))
-                (if (zerop package-count)
-                    (format "Emacs started in %s" time)
-                  (format "%d packages loaded in %s" package-count time)))))
-      
-      (defun nasy/-dashboard-items (_)
-        (insert "\n")
-        (widget-create 'item
-                       :tag "近期 (r)"
-                       :action #'consult-recent-file
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "🌓 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "open recent files")
-        (insert "\t")
-        (widget-create 'item
-                       :tag "書籤 (b)"
-                       :action #'consult-bookmark
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "🔖 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "open bookmarks")
-        (insert "\t")
-        (widget-create 'item
-                       :tag "項目 (p)"
-                       :action #'projectile-switch-project
-                       :mouse-face 'highlight
-                       :button-face 'dashboard-heading
-                       :button-prefix "🚀 "
-                       :button-suffix ""
-                       :format "%[%t%]"
-                       :help-echo "open projects")
-        (insert "               \n"))
-      
-      
-      (after-x 'dashboard
-        (defun nasy/dashboard-refresh ()
-          "Refresh dashboard buffer."
-          (interactive)
-          (unless (get-buffer dashboard-buffer-name)
-            (generate-new-buffer "*dashboard*"))
-          (dashboard-refresh-buffer)))
-      
-      (leaf dashboard
-        :leaf-autoload nil
-        :bind
-        ("<f5>" . dashboard-refresh-buffer)
-        (:dashboard-mode-map
-         ("r"              . consult-recent-file)
-         ("b"              . consult-bookmark)
-         ("p"              . projectile-switch-project))
-        :hook
-        ((dashboard-mode-hook . (lambda () (setq-local tab-width 1)))
-         (after-init-hook     . dashboard-setup-startup-hook)
-         (after-init-hook     . dashboard-refresh-buffer))
-        :custom
-        (dashboard-items . '((n-items . t)))
-        (dashboard-item-generators . '((n-items . nasy/-dashboard-items)))
-        ((dashboard-center-content
-          dashboard-set-heading-icons
-          dashboard-set-init-info) . t)
-        `(dashboard-startup-banner
-          . ,(expand-file-name "n_icon.png" user-emacs-directory))
-        :advice (:before dashboard-refresh-buffer nasy/-set-dashboard-init-info))
-      
-      (setq-default
-       initial-scratch-message     (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
-       dashboard-banner-logo-title (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
-       )
-    #+end_src
-
 * 编辑器
   #+begin_src elisp
     ;; 自动加载外部修改过的文件
@@ -607,6 +517,12 @@
 
 * 包
 
+** Minions
+#+begin_src elisp
+  (leaf minions
+    :config (minions-mode 1)
+    :init (straight-use-package 'minions))
+#+end_src
 ** Selectrum
 #+begin_src elisp
   (leaf selectrum
