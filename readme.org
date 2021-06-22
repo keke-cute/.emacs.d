@@ -484,6 +484,103 @@
           (setq highlight-indent-guides-method 'bitmap)
           :init (straight-use-package 'highlight-indent-guides)))
     #+end_src
+
+*** Dashboard
+[[https://github.com/nasyxx/emacs.d/blob/master/%E8%94%93%E8%89%B8/%E5%BA%AD%E5%B0%9E/%E7%AF%87.org][蔓艸/庭尞/篇.org]]
+#+begin_src emacs-lisp
+  (leaf page-break-lines
+    :hook
+    (after-init-hook . global-page-break-lines-mode)
+    (nasy/font-change-hook
+     . (lambda ()
+         (progn
+           (nasy/change-char-width page-break-lines-char 2)
+           (nasy/set-symbol ?⊸ 18 nil))))
+    :custom
+    (page-break-lines-char . ?⊸))
+  
+  (leaf dashboard
+    :commands (dashboard-refresh-buffer
+               dashboard-setup-startup-hook)
+    :init (straight-use-package 'dashboard))
+  
+  (defun nasy/-set-dashboard-init-info (&rest _)
+    (setq dashboard-init-info
+          (let ((package-count 0) (time (emacs-init-time)))
+            (setq package-count (+ (hash-table-size straight--profile-cache) package-count))
+            (if (zerop package-count)
+                (format "Emacs started in %s" time)
+              (format "%d packages loaded in %s" package-count time)))))
+  
+  (defun nasy/-dashboard-items (_)
+    (insert "\n")
+    (widget-create 'item
+                   :tag "近期 (r)"
+                   :action #'consult-recent-file
+                   :mouse-face 'highlight
+                   :button-face 'dashboard-heading
+                   :button-prefix "🌓 "
+                   :button-suffix ""
+                   :format "%[%t%]"
+                   :help-echo "open recent files")
+    (insert "\t")
+    (widget-create 'item
+                   :tag "書籤 (b)"
+                   :action #'consult-bookmark
+                   :mouse-face 'highlight
+                   :button-face 'dashboard-heading
+                   :button-prefix "🔖 "
+                   :button-suffix ""
+                   :format "%[%t%]"
+                   :help-echo "open bookmarks")
+    (insert "\t")
+    (widget-create 'item
+                   :tag "項目 (p)"
+                   :action #'projectile-switch-project
+                   :mouse-face 'highlight
+                   :button-face 'dashboard-heading
+                   :button-prefix "🚀 "
+                   :button-suffix ""
+                   :format "%[%t%]"
+                   :help-echo "open projects")
+    (insert "               \n"))
+  
+  
+  (after-x 'dashboard
+    (defun nasy/dashboard-refresh ()
+      "Refresh dashboard buffer."
+      (interactive)
+      (unless (get-buffer dashboard-buffer-name)
+        (generate-new-buffer "*dashboard*"))
+      (dashboard-refresh-buffer)))
+  
+  (leaf dashboard
+    :leaf-autoload nil
+    :bind
+    ("<f5>" . dashboard-refresh-buffer)
+    (:dashboard-mode-map
+     ("r"              . consult-recent-file)
+     ("b"              . consult-bookmark)
+     ("p"              . projectile-switch-project))
+    :hook
+    ((dashboard-mode-hook . (lambda () (setq-local tab-width 1)))
+     (after-init-hook     . dashboard-setup-startup-hook)
+     (after-init-hook     . dashboard-refresh-buffer))
+    :custom
+    (dashboard-items . '((n-items . t)))
+    (dashboard-item-generators . '((n-items . nasy/-dashboard-items)))
+    ((dashboard-center-content
+      dashboard-set-heading-icons
+      dashboard-set-init-info) . t)
+    `(dashboard-startup-banner
+      . ,(expand-file-name "n_icon.png" user-emacs-directory))
+    :advice (:before dashboard-refresh-buffer nasy/-set-dashboard-init-info))
+  
+  (setq-default
+   initial-scratch-message     (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
+   dashboard-banner-logo-title (concat ";; Happy hacking, " user-login-name " - Emacs ♥ you!\n\n")
+   )
+#+end_src
 * 编辑器
   #+begin_src emacs-lisp
     ;; 自动加载外部修改过的文件
