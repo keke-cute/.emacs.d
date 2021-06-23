@@ -1,7 +1,7 @@
 #+title: 我的 Emacs 配置文件
 #+author: keke
 #+email: librek@protonmail.com
-#+date: <2021-06-21 Mon>
+#+date: <2021-06-23 Wed>
 #+export_file_name: ~/Repos/keke-cute.github.io/emacs.html
 #+options: creator:t author:t
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="static/me.css" /> <a href="index.html">🏠 Back To Home</a>
@@ -457,21 +457,19 @@
 *** 彩虹括号
     #+begin_src emacs-lisp
       (leaf rainbow-delimiters
-        :hook
-        (prog-mode-hook . rainbow-delimiters-mode)
+        :hook prog-mode-hook org-src-mode-hook
         :config
-        ;; 设置每一级括号的颜色
         (custom-set-faces
          '(rainbow-delimiters-base-face    ((t (:inherit nil :weight bold))))
          '(rainbow-delimiters-depth-1-face ((t (:inherit rainbow-delimiters-base-face :foreground "dark orange"))))
-         '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "gold"))))
+         '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "DeepSkyBlue"))))
          '(rainbow-delimiters-depth-3-face ((t (:inherit rainbow-delimiters-base-face :foreground "YellowGreen"))))
          '(rainbow-delimiters-depth-4-face ((t (:inherit rainbow-delimiters-base-face :foreground "LimeGreen"))))
          '(rainbow-delimiters-depth-5-face ((t (:inherit rainbow-delimiters-base-face :foreground "dodger blue"))))
          '(rainbow-delimiters-depth-6-face ((t (:inherit rainbow-delimiters-base-face :foreground "MediumSlateBlue"))))
          '(rainbow-delimiters-depth-7-face ((t (:inherit rainbow-delimiters-base-face :foreground "blue violet"))))
          '(rainbow-delimiters-depth-8-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink"))))
-         '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "hot pink")))))
+         '(rainbow-delimiters-depth-9-face ((t (:inherit rainbow-delimiters-base-face :foreground "DeepPink")))))
         :init (straight-use-package 'rainbow-delimiters))
     #+end_src
 
