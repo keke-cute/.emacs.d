@@ -1,3 +1,6 @@
 [submodule "emacs-nasy-theme"]
 	path = emacs-nasy-theme
 	url = https://github.com/nasyxx/emacs-nasy-theme
+[submodule "vundo"]
+	path = vundo
+	url = https://github.com/casouri/vundo
