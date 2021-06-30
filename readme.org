@@ -1078,6 +1078,15 @@
        (go-mode-hook . lsp)
        :init (straight-use-package 'go-mode))
    #+end_src
+
+** Rust
+#+begin_src emacs-lisp
+  (leaf rust-mode
+    :hook
+    (rust-mode-hook . lsp)
+    :init (straight-use-package 'rust-mode))
+  
+#+end_src
 ** Nix
    #+begin_src emacs-lisp
      (straight-use-package 'nix-mode)
