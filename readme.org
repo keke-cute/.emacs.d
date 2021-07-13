@@ -935,6 +935,8 @@
        (defhydra keke/main (global-map "<f13>")
          "My main hydra keymap"
          ("a" eshell "Terminal")
+         ("c" compile "Compile")
+         ("C" recompile "Recompile")
          ("g" telega "Telegram")
          ("m" magit-status "Git Status(Magit)")
          ("r" org-roam-node-find "Find Org-roam node")
@@ -943,16 +945,19 @@
          ("f" projectile-find-file "Find Current Project File")
          ("p" projectile-switch-project "Switch Project")
          ("k" (keke/getgnukstatus) "Gnuk Status")
-         ("t" treemacs "Treemacs")
+         ("t" dired-sidebar-toggle-sidebar "dired-sidebar toggle")
          ("," centaur-tabs-backward "Next Tabs")
          ("." centaur-tabs-forward "Up Tabs")
-         ("T" treemacs-display-current-project-exclusively "Current Project in Treemacs")))
+         ("T" dired-sidebar-toggle-with-current-directory "dired-sidebar toggle in current directory")))
+     
+     (leaf hydra-posframe
+       :after hydra
    #+end_src
-** Treemacs
+** Dired-sidebar
    #+begin_src emacs-lisp
-     (leaf treemacs
-       :bind (("M-O" . treemacs-select-window))
-       :init (straight-use-package 'treemacs))
+     (leaf dired-sidebar
+       :commands (dired-sidebar-toggle-sidebar)
+       :init (straight-use-package 'dired-sidebar))
    #+end_src
 ** Ace-Window
    #+begin_src emacs-lisp
