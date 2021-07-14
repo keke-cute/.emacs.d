@@ -949,9 +949,6 @@
          ("," centaur-tabs-backward "Next Tabs")
          ("." centaur-tabs-forward "Up Tabs")
          ("T" dired-sidebar-toggle-with-current-directory "dired-sidebar toggle in current directory")))
-     
-     (leaf hydra-posframe
-       :after hydra
    #+end_src
 ** Dired-sidebar
    #+begin_src emacs-lisp
